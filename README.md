@@ -1,2 +1,1 @@
-# cross-chain-staking-shuttle
-Shuttle System for cross-chain staking
+# Cross chain Staking Pools
