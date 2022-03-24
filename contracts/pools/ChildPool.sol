@@ -76,7 +76,29 @@ contract ChildPool is IPool,  PoolSecurityModule {
         emit ShuttleCreated(currentShuttle);
     }
 
+    /**
+     *  Deposit Matic tokens to current shuttle
+     *
+     * @param _amount - Amount of matic to deposited in the shuttle.
+     */
+    function deposit(uint256 _amount) public payable whenNotPaused {
 
+        require(_amount > 0, "!amount");
+        require(msg.value == _amount, "!mismatch amount"); 
+        require(
+            shuttles[currentShuttle].status == ShuttleStatus.AVAILABLE,
+            "!Shuttle"
+        );
 
+        balances[currentShuttle][msg.sender] =
+            balances[currentShuttle][msg.sender].add(_amount);
 
+        shuttles[currentShuttle].totalAmount =
+            shuttles[currentShuttle].totalAmount.add(_amount);
+
+        availableMaticBalance = availableMaticBalance.add(_amount);
+
+        emit Deposit(currentShuttle, msg.sender, _amount);
+    }
+ 
 }

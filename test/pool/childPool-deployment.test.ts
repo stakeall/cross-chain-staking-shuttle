@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("ChildPool", function () {
+describe("ChildPool Deployment", function () {
 
-    it('validate ChildPool deployment', async () => {
+    it('validate ChildPool Deployment', async () => {
 
         const ChildPool = await ethers.getContractFactory(
             "ChildPool"
