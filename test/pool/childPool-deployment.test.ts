@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("ChildPool Deployment", function () {
+describe("ChildPool.init", function () {
 
     it('validate ChildPool Deployment', async () => {
 

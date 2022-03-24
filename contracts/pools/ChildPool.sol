@@ -8,17 +8,18 @@ import "./IPool.sol";
 import {IFxStateChildTunnel} from "./IPool.sol";
 import "./PoolSecurityModule.sol";
 
-contract ChildPool is IPool,  PoolSecurityModule {
+contract ChildPool is IPool, PoolSecurityModule {
     using SafeMath for uint256;
 
     IFxStateChildTunnel public childTunnel;
     IMaticToken public maticToken;
     IERC20 public stMaticToken;
     uint256 public shuttleExpiry;
-    uint256 public currentShuttle; 
+    uint256 public currentShuttle;
+    uint256 public enroutedShuttle;
     uint256 public availableMaticBalance;
     uint256 public availableStMaticBalance;
-    
+
     mapping(uint256 => Shuttle) public shuttles;
     mapping(uint256 => mapping(address => uint256)) public balances;
 
@@ -32,28 +33,25 @@ contract ChildPool is IPool,  PoolSecurityModule {
      * @param _owner - Address of the owner
      */
     function init(
-        IFxStateChildTunnel _childTunnel, 
+        IFxStateChildTunnel _childTunnel,
         IMaticToken _maticToken,
         IERC20 _stMaticToken,
         uint256 _shuttleExpiry,
         address _owner
-    ) 
-        public 
-        initializer
-     {
+    ) public initializer {
+        __AccessControl_init();
+        __Pausable_init();
+        __ReentrancyGuard_init();
 
-         __AccessControl_init();
-         __Pausable_init();
-         __ReentrancyGuard_init();
+        childTunnel = _childTunnel;
+        maticToken = _maticToken;
+        stMaticToken = _stMaticToken;
+        shuttleExpiry = _shuttleExpiry;
 
-         childTunnel = _childTunnel;
-         maticToken = _maticToken;
-         stMaticToken = _stMaticToken;
-         shuttleExpiry = _shuttleExpiry;
-
-         currentShuttle = 0;
-         availableMaticBalance = 0;
-         availableStMaticBalance = 0;
+        currentShuttle = 0;
+        enroutedShuttle = 0;
+        availableMaticBalance = 0;
+        availableStMaticBalance = 0;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _owner);
         _setupRole(OPERATOR_ROLE, _owner);
@@ -64,8 +62,7 @@ contract ChildPool is IPool,  PoolSecurityModule {
         createNewShuttle();
     }
 
-
-     function createNewShuttle() internal {
+    function createNewShuttle() internal {
         currentShuttle = currentShuttle.add(1);
         shuttles[currentShuttle] = Shuttle({
             totalAmount: 0,
@@ -77,28 +74,58 @@ contract ChildPool is IPool,  PoolSecurityModule {
     }
 
     /**
-     *  Deposit Matic tokens to current shuttle
+     * @dev Deposit Matic tokens to current shuttle
      *
-     * @param _amount - Amount of matic to deposited in the shuttle.
+     * @param _amount - Amount of matic to deposited in the current shuttle.
      */
     function deposit(uint256 _amount) public payable whenNotPaused {
-
         require(_amount > 0, "!amount");
-        require(msg.value == _amount, "!mismatch amount"); 
+        require(msg.value == _amount, "!mismatch amount");
         require(
             shuttles[currentShuttle].status == ShuttleStatus.AVAILABLE,
             "!Shuttle"
         );
 
-        balances[currentShuttle][msg.sender] =
-            balances[currentShuttle][msg.sender].add(_amount);
+        balances[currentShuttle][msg.sender] = balances[currentShuttle][
+            msg.sender
+        ].add(_amount);
 
-        shuttles[currentShuttle].totalAmount =
-            shuttles[currentShuttle].totalAmount.add(_amount);
+        shuttles[currentShuttle].totalAmount = shuttles[currentShuttle]
+            .totalAmount
+            .add(_amount);
 
         availableMaticBalance = availableMaticBalance.add(_amount);
 
         emit Deposit(currentShuttle, msg.sender, _amount);
     }
- 
+
+    /** 
+     * @dev Enroute Shuttle: Trigger crosschain transfer of funds 
+     *   - Withdraw funds to rootPool
+     *   - Send a message to root pool 
+     * 
+     * @param _shuttleNumber Shuttle Number that should be enrouted. 
+     * 
+     */
+    function enrouteShuttle(uint256 _shuttleNumber)
+        public
+        whenNotPaused
+        onlyRole(OPERATOR_ROLE)
+    {
+
+        require(enroutedShuttle == 0, "!already enrouted shuttle");
+        require(shuttles[_shuttleNumber].status == ShuttleStatus.AVAILABLE, "!status");
+        uint256 amount = shuttles[_shuttleNumber].totalAmount;
+        require(amount > 0, "!amount");
+
+        enroutedShuttle = _shuttleNumber;
+        shuttles[_shuttleNumber].status = ShuttleStatus.ENROUTE;
+        
+        availableMaticBalance = availableMaticBalance.sub(amount);
+
+        maticToken.withdraw{value: amount}(amount);
+        childTunnel.sendMessageToRoot(abi.encode(enroutedShuttle, amount));
+
+        emit ShuttleEnrouted(enroutedShuttle, amount);
+    }
 }

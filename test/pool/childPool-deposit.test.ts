@@ -3,16 +3,14 @@ import exp from "constants";
 import { ethers } from "hardhat";
 import { deployChildPool } from "./utils";
 
-describe("ChildPool", function () {
+describe("ChildPool.deposit", function () {
 
     it('validate ChildPool Deposit', async () => {
 
-        const [deployer, owner, childTunnel, maticToken, stMaticToken, user1] = await ethers.getSigners();
+        const [deployer, owner, stMaticToken, user1] = await ethers.getSigners();
 
-        const childPool = await deployChildPool(
+        const { childPool } = await deployChildPool(
             deployer,
-            childTunnel.address,
-            maticToken.address,
             stMaticToken.address,
             2000,
             owner.address
@@ -42,12 +40,10 @@ describe("ChildPool", function () {
 
     it('should fail for zero amount', async () => {
 
-        const [deployer, owner, childTunnel, maticToken, stMaticToken, user1] = await ethers.getSigners();
+        const [deployer, owner, stMaticToken, user1] = await ethers.getSigners();
 
-        const childPool = await deployChildPool(
+        const { childPool } = await deployChildPool(
             deployer,
-            childTunnel.address,
-            maticToken.address,
             stMaticToken.address,
             2000,
             owner.address
@@ -63,12 +59,10 @@ describe("ChildPool", function () {
 
     it('should fail if base token is not passed with deposit transaction', async () => {
 
-        const [deployer, owner, childTunnel, maticToken, stMaticToken, user1] = await ethers.getSigners();
+        const [deployer, owner, stMaticToken, user1] = await ethers.getSigners();
 
-        const childPool = await deployChildPool(
+        const { childPool } = await deployChildPool(
             deployer,
-            childTunnel.address,
-            maticToken.address,
             stMaticToken.address,
             2000,
             owner.address
@@ -84,12 +78,10 @@ describe("ChildPool", function () {
 
     it('Validate multiple deposits and multi user deposit', async () => {
 
-        const [deployer, owner, childTunnel, maticToken, stMaticToken, user1, user2] = await ethers.getSigners();
+        const [deployer, owner, stMaticToken, user1, user2] = await ethers.getSigners();
 
-        const childPool = await deployChildPool(
+        const { childPool } = await deployChildPool(
             deployer,
-            childTunnel.address,
-            maticToken.address,
             stMaticToken.address,
             2000,
             owner.address
@@ -142,7 +134,7 @@ describe("ChildPool", function () {
         }))
             .to.emit(childPool, 'Deposit').withArgs(1, user2.address, amount);
 
-       // asset user2 balance in shuttle 
+        // asset user2 balance in shuttle 
         expect(await childPool.balances(1, user2.address)).to.equals(ethers.utils.parseEther("5"));
 
         currentShuttleObject = await childPool.shuttles(1);
