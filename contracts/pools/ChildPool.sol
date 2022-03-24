@@ -1,6 +1,6 @@
 pragma solidity ^0.8.3;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+//import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -8,7 +8,7 @@ import "./IPool.sol";
 import {IFxStateChildTunnel} from "./IPool.sol";
 import "./PoolSecurityModule.sol";
 
-contract ChildPool is Initializable, IPool,  PoolSecurityModule {
+contract ChildPool is IPool,  PoolSecurityModule {
     using SafeMath for uint256;
 
     IFxStateChildTunnel public childTunnel;
@@ -22,6 +22,15 @@ contract ChildPool is Initializable, IPool,  PoolSecurityModule {
     mapping(uint256 => Shuttle) public shuttles;
     mapping(uint256 => mapping(address => uint256)) public balances;
 
+    /**
+     * Initialize the contract
+     *
+     * @param _childTunnel - Address of the child tunnel.
+     * @param _maticToken - Address of MATIC token on Polygon Mainnet
+     * @param _stMaticToken - Address of stMatic on Polygon Mainnet
+     * @param _shuttleExpiry - Expiry of shuttle in blocks
+     * @param _owner - Address of the owner
+     */
     function init(
         IFxStateChildTunnel _childTunnel, 
         IMaticToken _maticToken,
@@ -32,6 +41,10 @@ contract ChildPool is Initializable, IPool,  PoolSecurityModule {
         public 
         initializer
      {
+
+         __AccessControl_init();
+         __Pausable_init();
+         __ReentrancyGuard_init();
 
          childTunnel = _childTunnel;
          maticToken = _maticToken;
