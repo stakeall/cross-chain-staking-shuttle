@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import exp from "constants";
 import { ethers } from "hardhat";
-import { deployChildPool } from "./utils";
+import { deployChildPool } from "../utils";
 
 describe("ChildPool.deposit", function () {
 

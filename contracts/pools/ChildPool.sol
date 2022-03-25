@@ -1,6 +1,5 @@
 pragma solidity ^0.8.3;
 
-//import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -8,6 +7,9 @@ import "./IPool.sol";
 import {IFxStateChildTunnel} from "./IPool.sol";
 import "./PoolSecurityModule.sol";
 
+/**
+ * Manages user deposits for staking on child chain. 
+ */
 contract ChildPool is IPool, PoolSecurityModule {
     using SafeMath for uint256;
 
@@ -24,7 +26,7 @@ contract ChildPool is IPool, PoolSecurityModule {
     mapping(uint256 => mapping(address => uint256)) public balances;
 
     /**
-     * Initialize the contract
+     * Initialize the contract, setup roles and create first shuttle 
      *
      * @param _childTunnel - Address of the child tunnel.
      * @param _maticToken - Address of MATIC token on Polygon Mainnet
