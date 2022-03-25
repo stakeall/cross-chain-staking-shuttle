@@ -19,6 +19,7 @@ contract IPool {
     event ShuttleCreated(uint256 _shuttleNumber);
     event Deposit(uint256 _shuttlesNumber, address _sender, uint256 _amount);
     event ShuttleEnrouted(uint256 _shuttleNumber, uint256 _amount);
+    event ShuttleProcessed(uint256 _shuttleNumber, uint256 _stakeAmount, uint256 _stMaticAmount);
 }
 
 enum RootShuttleStatus {
