@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import exp from "constants";
 import { ethers } from "hardhat";
-import { deployChildPool, deployMockFxStateChildTunnel, deployMockMaticToken } from "../utils";
+import { deployChildPool, deployMockFxStateChildTunnel, deployMockMaticToken, getShuttleInEnrouteState } from "../utils";
 
 describe("ChildPool.enrouteShuttle", function () {
 
@@ -12,7 +12,6 @@ describe("ChildPool.enrouteShuttle", function () {
         // deploy child pool
         const { childPool, mockMaticToken, mockFxStateChildTunnel } = await deployChildPool(
             deployer,
-            stMaticToken.address,
             2000,
             owner.address
         );
@@ -52,7 +51,6 @@ describe("ChildPool.enrouteShuttle", function () {
 
         const { childPool } = await deployChildPool(
             deployer,
-            stMaticToken.address,
             2000,
             owner.address
         );
@@ -69,7 +67,6 @@ describe("ChildPool.enrouteShuttle", function () {
         // deploy child pool
         const { childPool } = await deployChildPool(
             deployer,
-            stMaticToken.address,
             2000,
             owner.address
         );
@@ -93,7 +90,6 @@ describe("ChildPool.enrouteShuttle", function () {
 
         const { childPool } = await deployChildPool(
             deployer,
-            stMaticToken.address,
             2000,
             owner.address
         );
@@ -107,5 +103,19 @@ describe("ChildPool.enrouteShuttle", function () {
         await expect(childPool.connect(user1).enrouteShuttle(1))
             .to.be.revertedWith(`AccessControl: account ${user1.address.toLowerCase()} is missing role 0x97667070c54ef182b0f5858b034beac1b6f3089aa2d3188bb1e8929f4fa9b929`);
     });
+
+    it('should  let deposit to next shuttle if current shuttle is enrouted', async() => {
+
+        const [deployer, owner, user1, user2] = await ethers.getSigners();
+
+        // deploy child pool
+        const { childPool } = await getShuttleInEnrouteState(deployer, 2000, owner, user1, user2);
+
+        const amount = ethers.utils.parseEther("1");
+        await expect(childPool.connect(user1).deposit(amount, {
+            value: amount
+        }))
+            .to.emit(childPool, 'Deposit').withArgs(2, user1.address, amount);
+    })
 
 });

@@ -19,10 +19,11 @@ contract IPool {
     event ShuttleCreated(uint256 _shuttleNumber);
     event Deposit(uint256 _shuttlesNumber, address _sender, uint256 _amount);
     event ShuttleEnrouted(uint256 _shuttleNumber, uint256 _amount);
-    event ShuttleProcessed(uint256 _shuttleNumber, uint256 _stakeAmount, uint256 _stMaticAmount);
+    event ShuttleProcessed(uint256 _shuttleNumber, uint256 _stakeAmount, uint256 _stMaticAmount, ShuttleProcessingStatus _processingStatus);
+    event ShuttleArrived(uint256 _shuttleNumber, uint256 _amount, ShuttleStatus _status);
 }
 
-enum RootShuttleStatus {
+enum ShuttleProcessingStatus {
     PROCESSED,
     CANCELLED 
 }
@@ -35,7 +36,7 @@ interface IFxStateChildTunnel {
         returns (
             uint256,
             uint256,
-            RootShuttleStatus
+            ShuttleProcessingStatus
         );
 }
 

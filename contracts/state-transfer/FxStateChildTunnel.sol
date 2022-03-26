@@ -33,13 +33,13 @@ contract FxStateChildTunnel is FxBaseChildTunnel, Ownable {
         _sendMessageToRoot(message);
     }
 
-    function readData() public view returns (uint256, uint256, RootShuttleStatus) {
-      (uint256 batchNumber, uint256 amount, RootShuttleStatus rootShuttleStatus) = abi.decode(
+    function readData() public view returns (uint256, uint256, ShuttleProcessingStatus) {
+      (uint256 shuttleNumber, uint256 amount, ShuttleProcessingStatus shuttleProcessingStatus) = abi.decode(
             latestData,
-            (uint256, uint256, RootShuttleStatus)
+            (uint256, uint256, ShuttleProcessingStatus)
         );
 
-        return (batchNumber,amount, rootShuttleStatus);
+        return (shuttleNumber, amount, shuttleProcessingStatus);
     }
 
     function setPool(address _pool) external onlyOwner {
