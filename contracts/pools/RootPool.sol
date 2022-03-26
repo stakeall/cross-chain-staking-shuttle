@@ -111,9 +111,9 @@ contract RootPool is IPool, PoolSecurityModule {
             amount
         );
         rootTunnel.sendMessageToChild(
-            abi.encode(shuttleNumber, stMaticAmount, RootShuttleStatus.PROCESSED)
+            abi.encode(shuttleNumber, stMaticAmount, ShuttleProcessingStatus.PROCESSED)
         );
 
-        emit ShuttleProcessed(shuttleNumber, amount, stMaticAmount);
+        emit ShuttleProcessed(shuttleNumber, amount, stMaticAmount, ShuttleProcessingStatus.PROCESSED);
     }
 }

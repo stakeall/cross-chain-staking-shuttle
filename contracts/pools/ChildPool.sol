@@ -8,7 +8,7 @@ import {IFxStateChildTunnel} from "./IPool.sol";
 import "./PoolSecurityModule.sol";
 
 /**
- * Manages user deposits for staking on child chain. 
+ * Manages user deposits for staking on child chain.
  */
 contract ChildPool is IPool, PoolSecurityModule {
     using SafeMath for uint256;
@@ -26,7 +26,7 @@ contract ChildPool is IPool, PoolSecurityModule {
     mapping(uint256 => mapping(address => uint256)) public balances;
 
     /**
-     * Initialize the contract, setup roles and create first shuttle 
+     * Initialize the contract, setup roles and create first shuttle
      *
      * @param _childTunnel - Address of the child tunnel.
      * @param _maticToken - Address of MATIC token on Polygon Mainnet
@@ -101,33 +101,92 @@ contract ChildPool is IPool, PoolSecurityModule {
         emit Deposit(currentShuttle, msg.sender, _amount);
     }
 
-    /** 
-     * @dev Enroute Shuttle: Trigger crosschain transfer of funds 
+    /**
+     * @dev Enroute Shuttle: Trigger crosschain transfer of funds
      *   - Withdraw funds to rootPool
-     *   - Send a message to root pool 
-     * 
-     * @param _shuttleNumber Shuttle Number that should be enrouted. 
-     * 
+     *   - Send a message to root pool
+     *
+     * @param _shuttleNumber Shuttle Number that should be enrouted.
+     *
      */
     function enrouteShuttle(uint256 _shuttleNumber)
         public
         whenNotPaused
         onlyRole(OPERATOR_ROLE)
     {
-
         require(enroutedShuttle == 0, "!already enrouted shuttle");
-        require(shuttles[_shuttleNumber].status == ShuttleStatus.AVAILABLE, "!status");
+        require(
+            shuttles[_shuttleNumber].status == ShuttleStatus.AVAILABLE,
+            "!status"
+        );
         uint256 amount = shuttles[_shuttleNumber].totalAmount;
         require(amount > 0, "!amount");
 
         enroutedShuttle = _shuttleNumber;
         shuttles[_shuttleNumber].status = ShuttleStatus.ENROUTE;
-        
+
         availableMaticBalance = availableMaticBalance.sub(amount);
 
         maticToken.withdraw{value: amount}(amount);
         childTunnel.sendMessageToRoot(abi.encode(enroutedShuttle, amount));
 
+        createNewShuttle();
+
         emit ShuttleEnrouted(enroutedShuttle, amount);
+    }
+
+    function arriveShuttle(uint256 _shuttleNumber)
+        public
+        whenNotPaused
+        onlyRole(OPERATOR_ROLE)
+    {
+        require(
+            enroutedShuttle == _shuttleNumber,
+            "!Shuttle should be enrouted"
+        );
+        require(
+            shuttles[_shuttleNumber].status == ShuttleStatus.ENROUTE,
+            "!status"
+        );
+
+        (
+            uint256 shuttleNumber,
+            uint256 amount,
+            ShuttleProcessingStatus shuttleProcessingStatus
+        ) = childTunnel.readData();
+
+        require(shuttleNumber == _shuttleNumber, "!shuttle message not recieved");
+
+        if (
+            shuttleProcessingStatus == ShuttleProcessingStatus.PROCESSED
+        ) {
+            // make sure stMatic is arrived from bridge
+            require(stMaticToken.balanceOf(address(this)) >= availableStMaticBalance.add(amount), "!insufficient stMatic balance");
+
+            availableStMaticBalance = availableStMaticBalance.add(amount);
+            shuttles[_shuttleNumber].recievedToken = amount;
+            shuttles[_shuttleNumber].status = ShuttleStatus.ARRIVED;
+
+
+        } else if (
+            shuttleProcessingStatus == ShuttleProcessingStatus.CANCELLED
+        ) {
+
+            // make sure Matic base token is arrived from bridge in case on cancellation
+            require(address(this).balance >= availableMaticBalance.add(shuttles[shuttleNumber].totalAmount), "!insufficient Matic balance");
+
+            availableMaticBalance = availableMaticBalance.add(amount);
+            shuttles[_shuttleNumber].recievedToken = 0;
+            shuttles[_shuttleNumber].status = ShuttleStatus.CANCELLED;
+        }
+
+        // reset it so that next shuttle can be enrouted 
+        enroutedShuttle = 0;
+
+        emit ShuttleArrived(shuttleNumber, amount, shuttles[_shuttleNumber].status);
+    }
+
+   receive() external payable {
+        
     }
 }
