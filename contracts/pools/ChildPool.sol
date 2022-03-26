@@ -4,7 +4,7 @@ import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./IPool.sol";
-import {IFxStateChildTunnel} from "./IPool.sol";
+import { IFxStateChildTunnel } from "./IPool.sol";
 import "./PoolSecurityModule.sol";
 
 /**
@@ -135,6 +135,14 @@ contract ChildPool is IPool, PoolSecurityModule {
         emit ShuttleEnrouted(enroutedShuttle, amount);
     }
 
+    /**
+     * @dev This function will be called by operator once funds and message is recieved from root chain. There are two different kind of messages that can be recieved.
+     * 1. PROCESSED: If shuttle on root chain is processed, then this function will change shuttle status to ARRIVED and users can claim stMatic
+     * 2. CANCELLED: If shuttle on root chain is cancelled, then this function will change shuttle status to CANCELLED and users can claim MATIC token.
+     *
+     * _shuttleNumber: Shuttle number that should be marked as arrived. 
+     *
+     */
     function arriveShuttle(uint256 _shuttleNumber)
         public
         whenNotPaused
@@ -186,6 +194,8 @@ contract ChildPool is IPool, PoolSecurityModule {
         emit ShuttleArrived(shuttleNumber, amount, shuttles[_shuttleNumber].status);
     }
 
+
+    //todo decide on receive vs fallback
    receive() external payable {
         
     }
