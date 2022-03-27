@@ -163,11 +163,7 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
         );
     }
 
-    function calculateFee(uint256 _amt)
-        public
-        view
-        returns (uint256)
-    {
+    function calculateFee(uint256 _amt) public view returns (uint256) {
         return (_amt.mul(feePercentage)).div(FEE_DENOMINATOR);
     }
 
@@ -176,10 +172,10 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
      * @param oneInchData - contains data returned from 1inch API. Struct defined in interfaces.sol
      * @param ethAmt - Eth to swap for .value()
      */
-    function oneInchSwap(
-        OneInchData memory oneInchData,
-        uint256 ethAmt
-    ) internal returns (uint256 buyAmt) {
+    function oneInchSwap(OneInchData memory oneInchData, uint256 ethAmt)
+        internal
+        returns (uint256 buyAmt)
+    {
         TokenInterface buyToken = oneInchData.buyToken;
         (uint256 _buyDec, uint256 _sellDec) = getTokensDec(
             buyToken,
