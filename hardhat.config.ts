@@ -4,6 +4,7 @@ import "@nomiclabs/hardhat-waffle";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "@nomiclabs/hardhat-web3";
+import "@openzeppelin/hardhat-upgrades";
 
 require("dotenv").config();
 
