@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {Helpers} from "./helpers.sol";
 import "./interface.sol";
@@ -15,8 +16,14 @@ import "../lib/TokenInterface.sol";
  */
 contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
-    event Deposited(address _beneficiary, uint256 _matic, uint256 _stMatic);
+    event Deposited(
+        address _beneficiary,
+        uint256 _matic,
+        uint256 _stMatic,
+        bool isBridged
+    );
 
     uint256 public feePercentage;
 
@@ -37,12 +44,9 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
      */
     function deposit(uint256 _amount) external payable {
         uint256 stTokenAmount = _stake(_amount);
-        TokenInterface(address(stMaticProxy)).transfer(
-            msg.sender,
-            stTokenAmount
-        );
+        IERC20(address(stMaticProxy)).safeTransfer(msg.sender, stTokenAmount);
 
-        emit Deposited(msg.sender, _amount, stTokenAmount);
+        emit Deposited(msg.sender, _amount, stTokenAmount, false);
     }
 
     /**
@@ -57,43 +61,35 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     {
         require(_beneficiary != address(0), "Invalid user address");
         uint256 stTokenAmount = _stake(_amount);
-        TokenInterface(address(stMaticProxy)).transfer(
-            _beneficiary,
-            stTokenAmount
-        );
+        IERC20(address(stMaticProxy)).transfer(_beneficiary, stTokenAmount);
 
-        emit Deposited(_beneficiary, _amount, stTokenAmount);
+        emit Deposited(_beneficiary, _amount, stTokenAmount, false);
     }
 
     /**
      * @notice It accepts any token, swaps using 1inch and performs staking
      *         to Polido. Received stMatic token is sent back to caller address.
      *
-     * @param _buyAddr The address of the token to buy.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
      * @param _sellAddr The address of the token to sell.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
      * @param _sellAmt The amount of the token to sell.
      * @param _unitAmt The amount of buyAmt/sellAmt with slippage.
      * @param _callData Data from 1inch API.
      */
     function swapAndStake(
-        address _buyAddr,
         address _sellAddr,
         uint256 _sellAmt,
         uint256 _unitAmt,
         bytes calldata _callData
     ) external payable {
         uint256 stMaticAmount = _swapAndStake(
-            _buyAddr,
             _sellAddr,
             _sellAmt,
             _unitAmt,
-            _callData
+            _callData,
+            false
         );
 
-        TokenInterface(address(stMaticProxy)).transfer(
-            msg.sender,
-            stMaticAmount
-        );
+        IERC20(address(stMaticProxy)).transfer(msg.sender, stMaticAmount);
     }
 
     /**
@@ -117,7 +113,6 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     /**
      * @dev Sell ETH/ERC20_Token using 1Inch, stake and send stMatic token to matic network.
      * @notice Swap tokens from exchanges like kyber, 0x etc, with calculation done off-chain.
-     * @param _buyAddr The address of the token to buy.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
      * @param _sellAddr The address of the token to sell.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
      * @param _sellAmt The amount of the token to sell.
      * @param _unitAmt The amount of buyAmt/sellAmt with slippage.
@@ -125,7 +120,6 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
      * @param _beneficiary ID stores the amount of token brought.
      */
     function swapStakeAndBridge(
-        address _buyAddr, // TODO: make it constant
         address _sellAddr,
         uint256 _sellAmt,
         uint256 _unitAmt,
@@ -133,11 +127,11 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
         address _beneficiary
     ) external payable {
         uint256 stMaticAmount = _swapAndStake(
-            _buyAddr,
             _sellAddr,
             _sellAmt,
             _unitAmt,
-            _callData
+            _callData,
+            true
         );
 
         _bridgeToMatic(stMaticAmount, _beneficiary);
@@ -149,7 +143,8 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     function _bridgeToMatic(uint256 _stTokenAmount, address _beneficiary)
         private
     {
-        TokenInterface(address(stMaticProxy)).approve(
+        IERC20(address(stMaticProxy)).safeApprove(mintableERC20Proxy, 0);
+        IERC20(address(stMaticProxy)).safeApprove(
             mintableERC20Proxy,
             _stTokenAmount
         );
@@ -176,10 +171,10 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
         internal
         returns (uint256 buyAmt)
     {
-        TokenInterface buyToken = oneInchData.buyToken;
+        IERC20 buyToken = oneInchData.buyToken;
         (uint256 _buyDec, uint256 _sellDec) = getTokensDec(
-            buyToken,
-            oneInchData.sellToken
+            TokenInterface(address(buyToken)),
+            TokenInterface(address(oneInchData.sellToken))
         );
 
         uint256 fees = calculateFee(oneInchData._sellAmt);
@@ -191,7 +186,6 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
         );
 
         uint256 initalBal = getTokenBal(buyToken);
-
         // solium-disable-next-line security/no-call-value
         (bool success, ) = oneInchAddr.call{value: ethAmt}(
             oneInchData.callData
@@ -213,25 +207,20 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
         internal
         returns (OneInchData memory)
     {
-        TokenInterface _sellAddr = oneInchData.sellToken;
+        IERC20 _sellAddr = oneInchData.sellToken;
 
         uint256 ethAmt;
         if (address(_sellAddr) == ethAddr) {
             ethAmt = oneInchData._sellAmt;
         } else {
-            require(
-                TokenInterface(address(_sellAddr)).transferFrom(
-                    msg.sender,
-                    address(this),
-                    oneInchData._sellAmt
-                ),
-                "Matic not approved"
-            );
-            approve(
-                TokenInterface(_sellAddr),
-                oneInchAddr,
+            _sellAddr.safeTransferFrom(
+                msg.sender,
+                address(this),
                 oneInchData._sellAmt
             );
+
+            _sellAddr.safeApprove(oneInchAddr, 0);
+            _sellAddr.safeApprove(oneInchAddr, oneInchData._sellAmt);
         }
 
         oneInchData._buyAmt = oneInchSwap(oneInchData, ethAmt);
@@ -242,22 +231,21 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     /**
      * @dev Sell ETH/ERC20_Token using 1Inch and stake to Polido.
      * @notice Swap tokens from exchanges like kyber, 0x etc, with calculation done off-chain.
-     * @param buyAddr The address of the token to buy.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
      * @param sellAddr The address of the token to sell.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
      * @param sellAmt The amount of the token to sell.
      * @param unitAmt The amount of buyAmt/sellAmt with slippage.
      * @param callData Data from 1inch API.
      */
     function _swapAndStake(
-        address buyAddr,
         address sellAddr,
         uint256 sellAmt,
         uint256 unitAmt,
-        bytes calldata callData
+        bytes calldata callData,
+        bool _isBridged
     ) private returns (uint256) {
         OneInchData memory oneInchData = OneInchData({
-            buyToken: TokenInterface(buyAddr),
-            sellToken: TokenInterface(sellAddr),
+            buyToken: maticToken,
+            sellToken: IERC20(sellAddr),
             unitAmt: unitAmt,
             callData: callData,
             _sellAmt: sellAmt,
@@ -266,10 +254,16 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
 
         oneInchData = _sell(oneInchData);
 
-        maticToken.approve(address(stMaticProxy), oneInchData._buyAmt);
+        maticToken.safeApprove(address(stMaticProxy), 0);
+        maticToken.safeApprove(address(stMaticProxy), oneInchData._buyAmt);
         uint256 stTokenAmount = stMaticProxy.submit(oneInchData._buyAmt);
 
-        emit Deposited(msg.sender, oneInchData._buyAmt, stTokenAmount);
+        emit Deposited(
+            msg.sender,
+            oneInchData._buyAmt,
+            stTokenAmount,
+            _isBridged
+        );
 
         return stTokenAmount;
     }
@@ -279,12 +273,10 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
      */
     function _stake(uint256 _amount) private returns (uint256) {
         require(_amount > 0, "Invalid amount");
-        require(
-            maticToken.transferFrom(msg.sender, address(this), _amount),
-            "Matic not approved"
-        );
+        maticToken.safeTransferFrom(msg.sender, address(this), _amount);
 
-        maticToken.approve(address(stMaticProxy), _amount);
+        maticToken.safeApprove(address(stMaticProxy), 0);
+        maticToken.safeApprove(address(stMaticProxy), _amount);
         uint256 stTokenAmount = stMaticProxy.submit(_amount);
 
         return stTokenAmount;
