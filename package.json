@@ -11,6 +11,7 @@
     "deploy-tunnel-mumbai": "npx hardhat run scripts/deploy_state_transfer_tunnels.js --network mumbai",
     "deploy_polido_adapter_goerli": "npx hardhat run scripts/deploy_polido_adapter.js --network goerli",
     "deploy_polido_adapter_mainnet": "npx hardhat run scripts/deploy_polido_adapter.js --network mainnet",
+    "deploy_polido_adapter_localhost": "npx hardhat run scripts/deploy_polido_adapter.js --network localhost",
     "upgrade_polido_adapter_goerli": "npx hardhat run scripts/upgrade_polido_adapter.js --network goerli"
   },
   "devDependencies": {

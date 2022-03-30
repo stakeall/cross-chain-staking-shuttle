@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.3;
 
-import "@openzeppelin/contracts/interfaces/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
 interface StMaticProxy {
     function submit(uint256 _amount) external returns (uint256);
@@ -21,8 +21,8 @@ interface RootchainManagerProxy {
 
 interface OneInchInterace {
     function swap(
-        IERC20 fromToken,
-        IERC20 toToken,
+        IERC20Upgradeable fromToken,
+        IERC20Upgradeable toToken,
         uint256 fromTokenAmount,
         uint256 minReturnAmount,
         uint256 guaranteedAmount,
@@ -38,8 +38,8 @@ interface OneInchInterace {
 }
 
 struct OneInchData {
-    IERC20 sellToken;
-    IERC20 buyToken;
+    IERC20Upgradeable sellToken;
+    IERC20Upgradeable buyToken;
     uint _sellAmt;
     uint _buyAmt;
     uint unitAmt;
