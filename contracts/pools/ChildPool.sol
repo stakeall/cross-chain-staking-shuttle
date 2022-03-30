@@ -135,6 +135,14 @@ contract ChildPool is IPool, PoolSecurityModule {
         emit ShuttleEnrouted(enroutedShuttle, amount);
     }
 
+    /**
+     * @dev This function will be called by operator once funds and message is recieved from root chain. There are two different kind of messages that can be recieved.
+     * 1. PROCESSED: If shuttle on root chain is processed, then this function will change shuttle status to ARRIVED and users can claim stMatic
+     * 2. CANCELLED: If shuttle on root chain is cancelled, then this function will change shuttle status to CANCELLED and users can claim MATIC token.
+     *
+     * _shuttleNumber: Shuttle number that should be marked as arrived.
+     *
+     */
     function arriveShuttle(uint256 _shuttleNumber)
         public
         whenNotPaused
@@ -155,38 +163,120 @@ contract ChildPool is IPool, PoolSecurityModule {
             ShuttleProcessingStatus shuttleProcessingStatus
         ) = childTunnel.readData();
 
-        require(shuttleNumber == _shuttleNumber, "!shuttle message not recieved");
+        require(
+            shuttleNumber == _shuttleNumber,
+            "!shuttle message not recieved"
+        );
 
-        if (
-            shuttleProcessingStatus == ShuttleProcessingStatus.PROCESSED
-        ) {
+        if (shuttleProcessingStatus == ShuttleProcessingStatus.PROCESSED) {
             // make sure stMatic is arrived from bridge
-            require(stMaticToken.balanceOf(address(this)) >= availableStMaticBalance.add(amount), "!insufficient stMatic balance");
+            require(
+                stMaticToken.balanceOf(address(this)) >=
+                    availableStMaticBalance.add(amount),
+                "!insufficient stMatic balance"
+            );
 
             availableStMaticBalance = availableStMaticBalance.add(amount);
             shuttles[_shuttleNumber].recievedToken = amount;
             shuttles[_shuttleNumber].status = ShuttleStatus.ARRIVED;
-
-
         } else if (
             shuttleProcessingStatus == ShuttleProcessingStatus.CANCELLED
         ) {
-
             // make sure Matic base token is arrived from bridge in case on cancellation
-            require(address(this).balance >= availableMaticBalance.add(shuttles[shuttleNumber].totalAmount), "!insufficient Matic balance");
+            require(
+                address(this).balance >=
+                    availableMaticBalance.add(
+                        shuttles[shuttleNumber].totalAmount
+                    ),
+                "!insufficient Matic balance"
+            );
 
             availableMaticBalance = availableMaticBalance.add(amount);
             shuttles[_shuttleNumber].recievedToken = 0;
             shuttles[_shuttleNumber].status = ShuttleStatus.CANCELLED;
         }
 
-        // reset it so that next shuttle can be enrouted 
+        // reset it so that next shuttle can be enrouted
         enroutedShuttle = 0;
 
-        emit ShuttleArrived(shuttleNumber, amount, shuttles[_shuttleNumber].status);
+        emit ShuttleArrived(
+            shuttleNumber,
+            amount,
+            shuttles[_shuttleNumber].status
+        );
     }
 
-   receive() external payable {
-        
+    /**
+     * @dev Returns amount of estimated stMatic token.
+     *
+     * @param _balance Balance of user in shuttle.
+     * @param _recievedToken Total StMatic amount recieved to a shuttle.
+     * @param _totalAmount Total matic deposited into shuttle. 
+     */
+    function calculateStMaticAmount(
+        uint256 _balance,
+        uint256 _recievedToken,
+        uint256 _totalAmount
+    ) public pure returns (uint256 amount_) {
+        amount_ = (_balance.mul(_recievedToken)).div(_totalAmount);
     }
+
+    /**
+     * @dev This function allows users to claim their funds. There are three cases to it.
+     *  1. Shuttle status is arrived: If shuttle is successfully processed and arrived. Users can claim stMatic token.
+     *  2. If shuttle is marked as expired, then users can claim deposited matic tokens.
+     *  3. If shuttle is marked as cancelled, then users can claim deposited matic tokens
+     *
+     * @param _shuttleNumber Shuttle number for which user want's to claim token
+     *
+     */
+    function claim(uint256 _shuttleNumber) external nonReentrant whenNotPaused {
+        Shuttle memory shuttle = shuttles[_shuttleNumber];
+        ShuttleStatus status = shuttle.status;
+
+        require(
+            status == ShuttleStatus.ARRIVED ||
+                status == ShuttleStatus.EXPIRED ||
+                status == ShuttleStatus.CANCELLED,
+            "!invalid shuttle status"
+        );
+
+        uint256 balance = balances[_shuttleNumber][msg.sender];
+        balances[_shuttleNumber][msg.sender] = 0;
+
+        address payable beneficiary = payable(msg.sender);
+
+        require(balance > 0, "!amount");
+
+        if (status == ShuttleStatus.ARRIVED) {
+            // calculate stMatic Amount
+            uint256 stMaticAmount = calculateStMaticAmount(
+                balance,
+                shuttles[_shuttleNumber].recievedToken,
+                shuttles[_shuttleNumber].totalAmount
+            );
+
+            availableStMaticBalance = availableStMaticBalance.sub(stMaticAmount);
+            stMaticToken.transfer(beneficiary, stMaticAmount);
+
+            emit TokenClaimed(
+                _shuttleNumber,
+                address(stMaticToken),
+                address(beneficiary),
+                stMaticAmount
+            );
+        } else {
+            availableMaticBalance = availableMaticBalance.sub(balance);
+            beneficiary.transfer(balance);
+            emit TokenClaimed(
+                _shuttleNumber,
+                address(maticToken),
+                address(beneficiary),
+                balance
+            );
+        }
+    }
+
+    //todo decide on receive vs fallback
+    receive() external payable {}
 }

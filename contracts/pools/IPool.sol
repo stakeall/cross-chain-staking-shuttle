@@ -19,13 +19,28 @@ contract IPool {
     event ShuttleCreated(uint256 _shuttleNumber);
     event Deposit(uint256 _shuttlesNumber, address _sender, uint256 _amount);
     event ShuttleEnrouted(uint256 _shuttleNumber, uint256 _amount);
-    event ShuttleProcessed(uint256 _shuttleNumber, uint256 _stakeAmount, uint256 _stMaticAmount, ShuttleProcessingStatus _processingStatus);
-    event ShuttleArrived(uint256 _shuttleNumber, uint256 _amount, ShuttleStatus _status);
+    event ShuttleProcessed(
+        uint256 _shuttleNumber,
+        uint256 _stakeAmount,
+        uint256 _stMaticAmount,
+        ShuttleProcessingStatus _processingStatus
+    );
+    event ShuttleArrived(
+        uint256 _shuttleNumber,
+        uint256 _amount,
+        ShuttleStatus _status
+    );
+    event TokenClaimed(
+        uint256 _shuttleNumber,
+        address _token,
+        address _beneficiary,
+        uint256 _claimedAmount
+    );
 }
 
 enum ShuttleProcessingStatus {
     PROCESSED,
-    CANCELLED 
+    CANCELLED
 }
 
 interface IFxStateChildTunnel {
@@ -69,6 +84,7 @@ interface IDepositManagerProxy {
 }
 
 interface IPolidoAdapter {
-
-    function depositForAndBridge(address _beneficiary, uint256 _amount) external returns(uint256);
+    function depositForAndBridge(address _beneficiary, uint256 _amount)
+        external
+        returns (uint256);
 }

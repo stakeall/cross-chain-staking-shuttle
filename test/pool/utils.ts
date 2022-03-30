@@ -30,7 +30,7 @@ export const deployChildPool = async (
     return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken };
 }
 
-export const getShuttleInEnrouteState = async(
+export const getShuttleInEnrouteState = async (
     deployer: SignerWithAddress,
     shuttleExpiry: number,
     owner: SignerWithAddress,
@@ -53,10 +53,53 @@ export const getShuttleInEnrouteState = async(
 
     await childPool.connect(owner).enrouteShuttle(1)
 
-    return {childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken};
+    return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken };
 }
 
-export const deployMockERC20 = async(deployer: SignerWithAddress) => {
+export const getShuttleInArrivedState = async (
+    deployer: SignerWithAddress,
+    shuttleExpiry: number,
+    owner: SignerWithAddress,
+    user1: SignerWithAddress,
+    user2: SignerWithAddress,
+    status: ShuttleProcessingStatus = ShuttleProcessingStatus.PROCESSED,
+    depositAmount: string = "2"
+) => {
+    const { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken } = await getShuttleInEnrouteState(deployer, shuttleExpiry, owner, user1, user2);
+
+    const shuttleArrivalData = {
+        stMaticAmount: ethers.utils.parseEther(depositAmount || "2"),
+        shuttleProcessingStatus: status,
+        shuttleNumber: 1
+    }
+
+    const encodedMessageData = ethers.utils.defaultAbiCoder.encode(
+        ["uint256", "uint256", "uint8"],
+        [shuttleArrivalData.shuttleNumber, shuttleArrivalData.stMaticAmount, shuttleArrivalData.shuttleProcessingStatus]
+    );
+
+    // mock message arrival 
+    await mockFxStateChildTunnel.setLatestData(encodedMessageData);
+    // mock token arrival 
+    if (status == ShuttleProcessingStatus.PROCESSED) {
+        await stMaticToken.mint(childPool.address, shuttleArrivalData.stMaticAmount);
+    } else {
+        // mock token arrival 
+        await deployer.sendTransaction({
+            to: childPool.address,
+            value: shuttleArrivalData.stMaticAmount,
+            from: deployer.address
+        })
+    }
+
+
+    await childPool.connect(owner).arriveShuttle(1);
+
+    return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken };
+
+}
+
+export const deployMockERC20 = async (deployer: SignerWithAddress) => {
     const MockERC20 = await ethers.getContractFactory(
         "MockERC20"
     );
@@ -90,8 +133,8 @@ export const deployMockFxStateChildTunnel = async (
 }
 
 export enum ShuttleProcessingStatus {
-    PROCESSED=0,
-    CANCELLED=1
+    PROCESSED = 0,
+    CANCELLED = 1
 }
 
 export enum ShuttleStatus {
@@ -99,5 +142,5 @@ export enum ShuttleStatus {
     ENROUTE = 1,
     ARRIVED = 2,
     EXPIRED = 3,
-    CANCELLED =4
+    CANCELLED = 4
 }
