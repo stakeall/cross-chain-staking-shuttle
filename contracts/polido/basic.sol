@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.3;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
 import {DSMath} from "./math.sol";
 import "../lib/TokenInterface.sol";
@@ -27,7 +26,7 @@ abstract contract Basic is DSMath {
         amt = mul(_amt, 10**(18 - _dec));
     }
 
-    function getTokenBal(IERC20 token)
+    function getTokenBal(IERC20Upgradeable token)
         internal
         view
         returns (uint256 _amt)

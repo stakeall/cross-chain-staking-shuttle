@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.3;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 import {Helpers} from "./helpers.sol";
 import "./interface.sol";
@@ -16,7 +16,7 @@ import "../lib/TokenInterface.sol";
  */
 contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     event Deposited(
         address _beneficiary,
@@ -44,7 +44,10 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
      */
     function deposit(uint256 _amount) external payable {
         uint256 stTokenAmount = _stake(_amount);
-        IERC20(address(stMaticProxy)).safeTransfer(msg.sender, stTokenAmount);
+        IERC20Upgradeable(address(stMaticProxy)).safeTransfer(
+            msg.sender,
+            stTokenAmount
+        );
 
         emit Deposited(msg.sender, _amount, stTokenAmount, false);
     }
@@ -61,7 +64,10 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     {
         require(_beneficiary != address(0), "Invalid user address");
         uint256 stTokenAmount = _stake(_amount);
-        IERC20(address(stMaticProxy)).transfer(_beneficiary, stTokenAmount);
+        IERC20Upgradeable(address(stMaticProxy)).safeTransfer(
+            _beneficiary,
+            stTokenAmount
+        );
 
         emit Deposited(_beneficiary, _amount, stTokenAmount, false);
     }
@@ -89,7 +95,10 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
             false
         );
 
-        IERC20(address(stMaticProxy)).transfer(msg.sender, stMaticAmount);
+        IERC20Upgradeable(address(stMaticProxy)).safeTransfer(
+            msg.sender,
+            stMaticAmount
+        );
     }
 
     /**
@@ -143,8 +152,11 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     function _bridgeToMatic(uint256 _stTokenAmount, address _beneficiary)
         private
     {
-        IERC20(address(stMaticProxy)).safeApprove(mintableERC20Proxy, 0);
-        IERC20(address(stMaticProxy)).safeApprove(
+        IERC20Upgradeable(address(stMaticProxy)).safeApprove(
+            mintableERC20Proxy,
+            0
+        );
+        IERC20Upgradeable(address(stMaticProxy)).safeApprove(
             mintableERC20Proxy,
             _stTokenAmount
         );
@@ -171,7 +183,7 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
         internal
         returns (uint256 buyAmt)
     {
-        IERC20 buyToken = oneInchData.buyToken;
+        IERC20Upgradeable buyToken = oneInchData.buyToken;
         (uint256 _buyDec, uint256 _sellDec) = getTokensDec(
             TokenInterface(address(buyToken)),
             TokenInterface(address(oneInchData.sellToken))
@@ -207,7 +219,7 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
         internal
         returns (OneInchData memory)
     {
-        IERC20 _sellAddr = oneInchData.sellToken;
+        IERC20Upgradeable _sellAddr = oneInchData.sellToken;
 
         uint256 ethAmt;
         if (address(_sellAddr) == ethAddr) {
@@ -245,7 +257,7 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     ) private returns (uint256) {
         OneInchData memory oneInchData = OneInchData({
             buyToken: maticToken,
-            sellToken: IERC20(sellAddr),
+            sellToken: IERC20Upgradeable(sellAddr),
             unitAmt: unitAmt,
             callData: callData,
             _sellAmt: sellAmt,

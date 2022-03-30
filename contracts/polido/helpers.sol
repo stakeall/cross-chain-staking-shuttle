@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.3;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
 import {DSMath} from "./math.sol";
 import {Basic} from "./basic.sol";
@@ -10,8 +10,8 @@ import "./interface.sol";
 
 abstract contract Helpers is DSMath, Basic {
     // Mainnet
-    IERC20 public constant maticToken =
-        IERC20(0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0);
+    IERC20Upgradeable public constant maticToken =
+        IERC20Upgradeable(0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0);
     StMaticProxy public constant stMaticProxy =
         StMaticProxy(0x9ee91F9f426fA633d227f7a9b000E28b9dfd8599);
 
