@@ -22,7 +22,7 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
         address _beneficiary,
         uint256 _matic,
         uint256 _stMatic,
-        bool isBridged
+        bool _isBridged
     );
 
     uint256 public feePercentage;
