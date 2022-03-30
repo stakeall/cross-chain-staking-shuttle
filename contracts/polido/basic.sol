@@ -2,6 +2,7 @@
 pragma solidity ^0.8.3;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {DSMath} from "./math.sol";
 import "../lib/TokenInterface.sol";
@@ -26,7 +27,11 @@ abstract contract Basic is DSMath {
         amt = mul(_amt, 10**(18 - _dec));
     }
 
-    function getTokenBal(TokenInterface token) internal view returns (uint256 _amt) {
+    function getTokenBal(IERC20 token)
+        internal
+        view
+        returns (uint256 _amt)
+    {
         _amt = address(token) == ethAddr
             ? address(this).balance
             : token.balanceOf(address(this));
@@ -41,14 +46,4 @@ abstract contract Basic is DSMath {
         sellDec = address(sellAddr) == ethAddr ? 18 : sellAddr.decimals();
     }
 
-    function approve(
-        TokenInterface token,
-        address spender,
-        uint256 amount
-    ) internal {
-        try token.approve(spender, amount) {} catch {
-            token.approve(spender, 0);
-            token.approve(spender, amount);
-        }
-    }
 }

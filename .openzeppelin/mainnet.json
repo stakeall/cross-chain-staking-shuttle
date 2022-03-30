@@ -1,0 +1,94 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0xCcEca936792668297abe6016fA1bEc37A255DA91",
+    "txHash": "0x2e1add36384b569807fa4ae23aca14061abe2c104ae4c928bda4271c5fecacd8"
+  },
+  "proxies": [
+    {
+      "address": "0x84100E5d1A6A50f1586338fdb1b52c78dC8C65eE",
+      "txHash": "0xbbd201047dfd6d8ba240b410b8e25bc64cca9b427bf0bc70c0b438067e4d6576",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "1f162735e0b4d996836d0240ea46f8fdc30190574360ab85eac12f1a080c60c2": {
+      "address": "0x70a10d241247D1C5Cae88Df42D87b06B90b871Fd",
+      "txHash": "0x0bb8c19d9f2bf687882f8baf6a55549daf7dd2432892215d17c8422fe1034cc7",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "label": "feePercentage",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "PoLidoAdapter",
+            "src": "contracts/polido/main.sol:21"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    }
+  }
+}

@@ -77,13 +77,7 @@ async function main() {
     .approve(polidoAdapterInstance.address, amount);
   await polidoAdapterInstance
     .connect(signer)
-    .swapAndStake(
-      maticAddress,
-      usdcAddr,
-      amount,
-      unitAmt,
-      swapResponse.data.tx.data
-    );
+    .swapAndStake(usdcAddr, amount, unitAmt, swapResponse.data.tx.data);
 
   console.log(
     "User stMatic balance ",
