@@ -1,7 +1,6 @@
 import { expect } from "chai";
-import exp from "constants";
 import { ethers } from "hardhat";
-import { deployChildPool, deployMockFxStateChildTunnel, deployMockMaticToken, getShuttleInEnrouteState } from "../utils";
+import { deployChildPool,  getShuttleInEnrouteState } from "../utils";
 
 describe("ChildPool.enrouteShuttle", function () {
 

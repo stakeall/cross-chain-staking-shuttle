@@ -40,8 +40,6 @@ describe("ChildPool.arriveShuttle", function () {
         const [deployer, owner, user1, user2] = await ethers.getSigners();
 
         // deploy child pool
-
-
         const { childPool, mockFxStateChildTunnel } = await getShuttleInEnrouteState(deployer, 2000, owner, user1, user2);
 
         const shuttleArrivalData = {
