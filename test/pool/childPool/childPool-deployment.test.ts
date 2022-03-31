@@ -9,17 +9,20 @@ describe("ChildPool.init", function () {
             "ChildPool"
         );
 
-        const [deployer, owner, childTunnel, maticToken, stMaticToken] = await ethers.getSigners();
+        const [deployer, owner, childTunnel, maticToken, stMaticToken, feeBeneficiary] = await ethers.getSigners();
 
         const childPool = await ChildPool.connect(deployer).deploy();
         await childPool.deployed();
 
         const shuttleExpiry = 2000;
+        const fee = 500;
         const initPool = await childPool.connect(deployer).init(
             childTunnel.address,
             maticToken.address,
             stMaticToken.address,
             shuttleExpiry,
+            fee,
+            feeBeneficiary.address,
             owner.address
         );
 
@@ -33,6 +36,8 @@ describe("ChildPool.init", function () {
         expect(await childPool.maticToken()).to.equal(maticToken.address);
         expect(await childPool.stMaticToken()).to.equal(stMaticToken.address);
         expect(await childPool.shuttleExpiry()).to.equal(shuttleExpiry);
+        expect(await childPool.fee()).to.equal(fee);
+        expect(await childPool.feeBeneficiary()).to.equal(feeBeneficiary.address);
         expect(await childPool.currentShuttle()).to.equal(1);
         expect(await childPool.availableMaticBalance()).to.equal(0);
         expect(await childPool.availableStMaticBalance()).to.equal(0);

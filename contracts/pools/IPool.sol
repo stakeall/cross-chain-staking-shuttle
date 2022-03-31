@@ -28,7 +28,8 @@ contract IPool {
     event ShuttleArrived(
         uint256 _shuttleNumber,
         uint256 _amount,
-        ShuttleStatus _status
+        ShuttleStatus _status,
+        uint256 _shuttleFee
     );
     event TokenClaimed(
         uint256 _shuttleNumber,

@@ -7,12 +7,13 @@ describe("ChildPool.deposit", function () {
 
     it('validate ChildPool Deposit', async () => {
 
-        const [deployer, owner, user1] = await ethers.getSigners();
+        const [deployer, owner, user1,feeBeneficiary] = await ethers.getSigners();
 
         const { childPool } = await deployChildPool(
             deployer,
             2000,
-            owner.address
+            owner.address,
+            feeBeneficiary.address
         );
 
         const amount = ethers.utils.parseEther("1");
@@ -39,12 +40,13 @@ describe("ChildPool.deposit", function () {
 
     it('should fail for zero amount', async () => {
 
-        const [deployer, owner, user1] = await ethers.getSigners();
+        const [deployer, owner, user1, feeBeneficiary] = await ethers.getSigners();
 
         const { childPool } = await deployChildPool(
             deployer,
             2000,
-            owner.address
+            owner.address,
+            feeBeneficiary.address
         );
 
         const amount = ethers.utils.parseEther("0");
@@ -57,12 +59,13 @@ describe("ChildPool.deposit", function () {
 
     it('should fail if base token is not passed with deposit transaction', async () => {
 
-        const [deployer, owner, user1] = await ethers.getSigners();
+        const [deployer, owner, user1, feeBeneficiary] = await ethers.getSigners();
 
         const { childPool } = await deployChildPool(
             deployer,
             2000,
-            owner.address
+            owner.address,
+            feeBeneficiary.address
         );
 
         const amount = ethers.utils.parseEther("1");
@@ -75,12 +78,13 @@ describe("ChildPool.deposit", function () {
 
     it('Validate multiple deposits and multi user deposit', async () => {
 
-        const [deployer, owner, user1, user2] = await ethers.getSigners();
+        const [deployer, owner, user1, user2, feeBeneficiary] = await ethers.getSigners();
 
         const { childPool } = await deployChildPool(
             deployer,
             2000,
-            owner.address
+            owner.address,
+            feeBeneficiary.address
         );
 
         // Test for user1

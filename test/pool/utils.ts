@@ -4,7 +4,9 @@ import { ethers } from "hardhat";
 export const deployChildPool = async (
     deployer: SignerWithAddress,
     shuttleExpiry: number,
-    ownerAddress: string
+    ownerAddress: string,
+    feeBeneficiary: string,
+    fee: number = 500,
 ) => {
 
     const mockMaticToken = await deployMockMaticToken(deployer);
@@ -22,7 +24,9 @@ export const deployChildPool = async (
         mockMaticToken.address,
         stMaticToken.address,
         shuttleExpiry,
-        ownerAddress
+        fee,
+        feeBeneficiary,
+        ownerAddress,
     );
     await initPool.wait();
 
@@ -37,7 +41,7 @@ export const getShuttleInEnrouteState = async (
     user1: SignerWithAddress,
     user2: SignerWithAddress
 ) => {
-    const { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken } = await deployChildPool(deployer, shuttleExpiry, owner.address);
+    const { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken } = await deployChildPool(deployer, shuttleExpiry, owner.address, deployer.address);
 
     let amount = ethers.utils.parseEther("1");
     await childPool.connect(user1).deposit(amount, {

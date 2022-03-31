@@ -21,6 +21,9 @@ contract ChildPool is IPool, PoolSecurityModule {
     uint256 public enroutedShuttle;
     uint256 public availableMaticBalance;
     uint256 public availableStMaticBalance;
+    uint256 public fee;
+    address public feeBeneficiary;
+    uint256 public constant FEE_DENOMINATOR = 10000;
 
     mapping(uint256 => Shuttle) public shuttles;
     mapping(uint256 => mapping(address => uint256)) public balances;
@@ -32,6 +35,8 @@ contract ChildPool is IPool, PoolSecurityModule {
      * @param _maticToken - Address of MATIC token on Polygon Mainnet
      * @param _stMaticToken - Address of stMatic on Polygon Mainnet
      * @param _shuttleExpiry - Expiry of shuttle in blocks
+     * @param _fee - Fee percentange on base 10000 that will be charged on successful arrival of shuttle.
+     * @param _feeBeneficiary - Address to which fee will be transferred.
      * @param _owner - Address of the owner
      */
     function init(
@@ -39,6 +44,8 @@ contract ChildPool is IPool, PoolSecurityModule {
         IMaticToken _maticToken,
         IERC20 _stMaticToken,
         uint256 _shuttleExpiry,
+        uint256 _fee,
+        address _feeBeneficiary,
         address _owner
     ) public initializer {
         __AccessControl_init();
@@ -49,6 +56,8 @@ contract ChildPool is IPool, PoolSecurityModule {
         maticToken = _maticToken;
         stMaticToken = _stMaticToken;
         shuttleExpiry = _shuttleExpiry;
+        fee = _fee;
+        feeBeneficiary = _feeBeneficiary;
 
         currentShuttle = 0;
         enroutedShuttle = 0;
@@ -135,6 +144,14 @@ contract ChildPool is IPool, PoolSecurityModule {
         emit ShuttleEnrouted(enroutedShuttle, amount);
     }
 
+    function calculateFee(uint256 _amount)
+        internal
+        view
+        returns (uint256 fee_)
+    {
+        fee_ = _amount.mul(fee).div(FEE_DENOMINATOR);
+    }
+
     /**
      * @dev This function will be called by operator once funds and message is recieved from root chain. There are two different kind of messages that can be recieved.
      * 1. PROCESSED: If shuttle on root chain is processed, then this function will change shuttle status to ARRIVED and users can claim stMatic
@@ -168,6 +185,8 @@ contract ChildPool is IPool, PoolSecurityModule {
             "!shuttle message not recieved"
         );
 
+        uint256 shuttleFee = 0;
+
         if (shuttleProcessingStatus == ShuttleProcessingStatus.PROCESSED) {
             // make sure stMatic is arrived from bridge
             require(
@@ -177,7 +196,12 @@ contract ChildPool is IPool, PoolSecurityModule {
             );
 
             availableStMaticBalance = availableStMaticBalance.add(amount);
-            shuttles[_shuttleNumber].recievedToken = amount;
+
+            shuttleFee = calculateFee(amount);
+
+            stMaticToken.transfer(feeBeneficiary, shuttleFee);
+
+            shuttles[_shuttleNumber].recievedToken = amount.sub(shuttleFee);
             shuttles[_shuttleNumber].status = ShuttleStatus.ARRIVED;
         } else if (
             shuttleProcessingStatus == ShuttleProcessingStatus.CANCELLED
@@ -202,7 +226,8 @@ contract ChildPool is IPool, PoolSecurityModule {
         emit ShuttleArrived(
             shuttleNumber,
             amount,
-            shuttles[_shuttleNumber].status
+            shuttles[_shuttleNumber].status,
+            shuttleFee
         );
     }
 
@@ -211,7 +236,7 @@ contract ChildPool is IPool, PoolSecurityModule {
      *
      * @param _balance Balance of user in shuttle.
      * @param _recievedToken Total StMatic amount recieved to a shuttle.
-     * @param _totalAmount Total matic deposited into shuttle. 
+     * @param _totalAmount Total matic deposited into shuttle.
      */
     function calculateStMaticAmount(
         uint256 _balance,
@@ -256,7 +281,9 @@ contract ChildPool is IPool, PoolSecurityModule {
                 shuttles[_shuttleNumber].totalAmount
             );
 
-            availableStMaticBalance = availableStMaticBalance.sub(stMaticAmount);
+            availableStMaticBalance = availableStMaticBalance.sub(
+                stMaticAmount
+            );
             stMaticToken.transfer(beneficiary, stMaticAmount);
 
             emit TokenClaimed(
@@ -275,6 +302,18 @@ contract ChildPool is IPool, PoolSecurityModule {
                 balance
             );
         }
+    }
+
+    /** Setter */
+
+    /**
+     *
+     * @dev Set's the fee percentange. Fee percentage is set at base 10000.
+     *
+     * @param _fee Fee percentage with 10000 as hundred percentage. 
+     */
+    function setFee(uint256 _fee) external onlyRole(GOVERNANCE_ROLE) {
+        fee = _fee;
     }
 
     //todo decide on receive vs fallback
