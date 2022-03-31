@@ -6,13 +6,14 @@ describe("ChildPool.enrouteShuttle", function () {
 
     it('validate enroute shuttle', async () => {
 
-        const [deployer, owner, stMaticToken, user1, user2] = await ethers.getSigners();
+        const [deployer, owner, stMaticToken, user1, user2, feeBeneficiary] = await ethers.getSigners();
 
         // deploy child pool
         const { childPool, mockMaticToken, mockFxStateChildTunnel } = await deployChildPool(
             deployer,
             2000,
-            owner.address
+            owner.address,
+            feeBeneficiary.address
         );
 
         const prevShuttleObject = await childPool.shuttles(1);
@@ -46,12 +47,13 @@ describe("ChildPool.enrouteShuttle", function () {
 
     it('should fail for zero amount', async () => {
 
-        const [deployer, owner, stMaticToken, user1] = await ethers.getSigners();
+        const [deployer, owner, stMaticToken, user1, feeBeneficiary] = await ethers.getSigners();
 
         const { childPool } = await deployChildPool(
             deployer,
             2000,
-            owner.address
+            owner.address,
+            feeBeneficiary.address
         );
 
         await expect(childPool.connect(owner).enrouteShuttle(1))
@@ -61,13 +63,14 @@ describe("ChildPool.enrouteShuttle", function () {
 
     it('should fail if shuttle already enrouted', async () => {
 
-        const [deployer, owner, stMaticToken, user1, user2] = await ethers.getSigners();
+        const [deployer, owner, stMaticToken, user1, user2, feeBeneficiary] = await ethers.getSigners();
 
         // deploy child pool
         const { childPool } = await deployChildPool(
             deployer,
             2000,
-            owner.address
+            owner.address,
+            feeBeneficiary.address
         );
 
         // deposit user 1
@@ -85,12 +88,13 @@ describe("ChildPool.enrouteShuttle", function () {
 
     it('should fail for non operator role', async () => {
 
-        const [deployer, owner, stMaticToken, user1] = await ethers.getSigners();
+        const [deployer, owner, stMaticToken, user1, feeBeneficiary] = await ethers.getSigners();
 
         const { childPool } = await deployChildPool(
             deployer,
             2000,
-            owner.address
+            owner.address,
+            feeBeneficiary.address
         );
 
           // deposit user 1

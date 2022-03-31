@@ -1,6 +1,7 @@
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import { deployChildPool, deployMockERC20, getShuttleInEnrouteState, ShuttleProcessingStatus, ShuttleStatus } from "../utils";
+import { getShuttleInEnrouteState, ShuttleProcessingStatus, ShuttleStatus } from "../utils";
 
 describe("ChildPool.arriveShuttle", function () {
 
@@ -27,12 +28,18 @@ describe("ChildPool.arriveShuttle", function () {
         // mock token arrival 
         await stMaticToken.mint(childPool.address, shuttleArrivalData.stMaticAmount);
 
-        await expect(childPool.connect(owner).arriveShuttle(1)).to.emit(childPool, 'ShuttleArrived').withArgs(1, shuttleArrivalData.stMaticAmount, ShuttleStatus.ARRIVED);
+        const fee =
+            BigNumber.from(500).mul(BigNumber.from(shuttleArrivalData.stMaticAmount)).div(BigNumber.from(10000));
+        await expect(childPool.connect(owner).arriveShuttle(1)).to.emit(childPool, 'ShuttleArrived').withArgs(1, shuttleArrivalData.stMaticAmount, ShuttleStatus.ARRIVED, fee);
 
 
         const shuttleObject = await childPool.shuttles(1);
         expect(shuttleObject.status).to.equals(ShuttleStatus.ARRIVED);
-        expect(shuttleObject.recievedToken).to.equals(shuttleArrivalData.stMaticAmount);
+        
+        expect(shuttleObject.recievedToken).to.equals(BigNumber.from(shuttleArrivalData.stMaticAmount).sub(BigNumber.from(fee)));
+        const feeBeneficiaryStMaticBalance = await stMaticToken.balanceOf(deployer.address);
+
+        expect(feeBeneficiaryStMaticBalance).to.equals(feeBeneficiaryStMaticBalance);
     });
 
     it('validate arrive shuttle in case of cancelled shuttle', async () => {
@@ -64,7 +71,7 @@ describe("ChildPool.arriveShuttle", function () {
 
         let shuttleObject = await childPool.shuttles(1);
 
-        await expect(childPool.connect(owner).arriveShuttle(1)).to.emit(childPool, 'ShuttleArrived').withArgs(1, shuttleObject.totalAmount, ShuttleStatus.CANCELLED);
+        await expect(childPool.connect(owner).arriveShuttle(1)).to.emit(childPool, 'ShuttleArrived').withArgs(1, shuttleObject.totalAmount, ShuttleStatus.CANCELLED, 0);
 
 
         shuttleObject = await childPool.shuttles(1);
@@ -258,11 +265,13 @@ describe("ChildPool.arriveShuttle", function () {
         // mock token arrival 
         await stMaticToken.mint(childPool.address, shuttleArrivalData.stMaticAmount);
 
-        await expect(childPool.connect(owner).arriveShuttle(1)).to.emit(childPool, 'ShuttleArrived').withArgs(1, shuttleArrivalData.stMaticAmount, ShuttleStatus.ARRIVED);
+        const fee =
+            BigNumber.from(500).mul(BigNumber.from(shuttleArrivalData.stMaticAmount)).div(BigNumber.from(10000));
+        await expect(childPool.connect(owner).arriveShuttle(1)).to.emit(childPool, 'ShuttleArrived').withArgs(1, shuttleArrivalData.stMaticAmount, ShuttleStatus.ARRIVED, fee);
 
 
         await expect(childPool.connect(owner).enrouteShuttle(2))
-        .to.emit(childPool, 'ShuttleEnrouted').withArgs(2, amount);
+            .to.emit(childPool, 'ShuttleEnrouted').withArgs(2, amount);
     })
 
 });
