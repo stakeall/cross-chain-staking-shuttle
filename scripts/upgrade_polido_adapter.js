@@ -3,7 +3,7 @@ const { ethers, upgrades } = require("hardhat");
 async function main() {
   const PoLidoAdapter = await ethers.getContractFactory("PoLidoAdapter");
 
-  const proxy = "0xE6Deb3D6b559ca2AB123e8307c3aa4d7586E29a3";
+  const proxy = "0x84100E5d1A6A50f1586338fdb1b52c78dC8C65eE";
 
   await upgrades.upgradeProxy(proxy, PoLidoAdapter);
   console.log("Proxy upgraded");
