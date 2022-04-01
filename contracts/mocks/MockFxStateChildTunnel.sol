@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
 
-import "../pools/IPool.sol";
+import "../pools/IChildPool.sol";
 
 contract MockFxStateChildTunnel {
     bytes public data;

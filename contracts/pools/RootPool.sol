@@ -3,11 +3,10 @@ pragma solidity ^0.8.3;
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./IPool.sol";
-import {IFxStateChildTunnel} from "./IPool.sol";
+import "./IRootPool.sol";
 import "./PoolSecurityModule.sol";
 
-contract RootPool is IPool, PoolSecurityModule {
+contract RootPool is IRootPool, PoolSecurityModule {
     using SafeMath for uint256;
 
     IFxStateRootTunnel public rootTunnel;
