@@ -34,6 +34,8 @@ contract IChildPool {
 
     event ShuttleExpired(uint256 _shuttleNumber);
     event ShuttleCancelled(uint256 _shuttleNumber);
+    event FeeChanged(uint256 _fee);
+    event ShuttleExpiryChanged(uint256 _shuttleExpiry);
 }
 
 enum ShuttleProcessingStatus {

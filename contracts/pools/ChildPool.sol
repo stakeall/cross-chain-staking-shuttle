@@ -357,6 +357,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      */
     function setFee(uint256 _fee) external onlyRole(GOVERNANCE_ROLE) {
         fee = _fee;
+        emit FeeChanged(fee);
     }
 
     /**
@@ -367,6 +368,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      */
     function setShuttleExpiry(uint256 _shuttleExpiry) external onlyRole(GOVERNANCE_ROLE) {
         shuttleExpiry = _shuttleExpiry;
+        emit ShuttleExpiryChanged(shuttleExpiry);
     }
 
     //todo decide on receive vs fallback
