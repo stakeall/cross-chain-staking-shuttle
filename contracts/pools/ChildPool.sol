@@ -89,7 +89,7 @@ contract ChildPool is IPool, PoolSecurityModule {
      *
      * @param _amount - Amount of matic to deposited in the current shuttle.
      */
-    function deposit(uint256 _amount) public payable whenNotPaused {
+    function deposit(uint256 _amount) external payable whenNotPaused {
         require(_amount > 0, "!amount");
         require(msg.value == _amount, "!mismatch amount");
         require(
@@ -119,7 +119,7 @@ contract ChildPool is IPool, PoolSecurityModule {
      *
      */
     function enrouteShuttle(uint256 _shuttleNumber)
-        public
+        external
         whenNotPaused
         onlyRole(OPERATOR_ROLE)
     {
@@ -161,7 +161,7 @@ contract ChildPool is IPool, PoolSecurityModule {
      *
      */
     function arriveShuttle(uint256 _shuttleNumber)
-        public
+        external
         whenNotPaused
         onlyRole(OPERATOR_ROLE)
     {
@@ -203,7 +203,7 @@ contract ChildPool is IPool, PoolSecurityModule {
 
             shuttles[_shuttleNumber].recievedToken = amount.sub(shuttleFee);
             shuttles[_shuttleNumber].status = ShuttleStatus.ARRIVED;
-            
+
             stMaticToken.transfer(feeBeneficiary, shuttleFee);
         } else if (
             shuttleProcessingStatus == ShuttleProcessingStatus.CANCELLED
@@ -221,7 +221,6 @@ contract ChildPool is IPool, PoolSecurityModule {
             shuttles[_shuttleNumber].recievedToken = 0;
             shuttles[_shuttleNumber].status = ShuttleStatus.CANCELLED;
         }
-
 
         emit ShuttleArrived(
             shuttleNumber,
@@ -306,26 +305,47 @@ contract ChildPool is IPool, PoolSecurityModule {
 
     /**
      * @dev If a shuttle is not enrouted after a specific block delay of `shuttleExpiry` then any one can call this function and mark shuttle as expired.
-     *      Once the shuttle is marked as expired, users can claim their deposited MATIC tokens. 
+     *      Once the shuttle is marked as expired, users can claim their deposited MATIC tokens.
      *
      * @param _shuttleNumber Id of shuttle
      *
      */
-    function expireShuttle(uint256 _shuttleNumber) external {
-
-     Shuttle memory shuttle = shuttles[_shuttleNumber];
-
+    function expireShuttle(uint256 _shuttleNumber) external whenNotPaused {
         require(
-            shuttle.totalAmount > 0,
-            "!Not ready for expiry"
+            _shuttleNumber == currentShuttle,
+            "!only current shuttle allowed"
         );
+        Shuttle memory shuttle = shuttles[_shuttleNumber];
 
-        require(block.number >= shuttle.expiry, "!not ready to expire" );
+        require(shuttle.totalAmount > 0, "!Not ready for expiry");
+
+        require(block.number >= shuttle.expiry, "!not ready to expire");
 
         shuttles[_shuttleNumber].status = ShuttleStatus.EXPIRED;
 
         createNewShuttle();
         emit ShuttleExpired(_shuttleNumber);
+    }
+
+    /**
+     * Operator can cancel shuttle which is in available status, users will be able to claim deposited matic tokens once shuttle is cancelled.
+     *
+     * @param _shuttleNumber Id of shuttle.
+     */
+    function cancelShuttle(uint256 _shuttleNumber)
+        external
+        onlyRole(OPERATOR_ROLE)
+    {
+        require(
+            _shuttleNumber == currentShuttle,
+            "!only current shuttle allowed"
+        );
+        Shuttle memory shuttle = shuttles[_shuttleNumber];
+        require(shuttle.status == ShuttleStatus.AVAILABLE, "!invalid status");
+
+        shuttles[_shuttleNumber].status = ShuttleStatus.CANCELLED;
+        createNewShuttle();
+        emit ShuttleCancelled(_shuttleNumber);
     }
 
     /** Setter */
@@ -334,7 +354,7 @@ contract ChildPool is IPool, PoolSecurityModule {
      *
      * @dev Set's the fee percentange. Fee percentage is set at base 10000.
      *
-     * @param _fee Fee percentage with 10000 as hundred percentage. 
+     * @param _fee Fee percentage with 10000 as hundred percentage.
      */
     function setFee(uint256 _fee) external onlyRole(GOVERNANCE_ROLE) {
         fee = _fee;

@@ -39,6 +39,7 @@ contract IPool {
     );
 
     event ShuttleExpired(uint256 _shuttleNumber);
+    event ShuttleCancelled(uint256 _shuttleNumber);
 }
 
 enum ShuttleProcessingStatus {

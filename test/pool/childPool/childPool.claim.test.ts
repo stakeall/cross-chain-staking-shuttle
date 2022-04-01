@@ -153,4 +153,29 @@ describe("ChildPool.claim", function () {
 
     });
 
+    it('should allow users to claim tokens after shuttle is cancelled', async() => {
+        const [deployer, owner, user1,  feeBeneficiary] = await ethers.getSigners();
+
+        // deploy child pool
+        const expiryBlock = 5;
+        const { childPool, mockMaticToken } = await deployChildPool(
+            deployer,
+            expiryBlock,
+            owner.address,
+            feeBeneficiary.address
+        );
+
+        const amount = ethers.utils.parseEther("1");
+        await childPool.connect(user1).deposit(amount, {
+            value: amount
+        });
+
+        await advanceBlocks(10);
+
+        await expect(childPool.connect(owner).cancelShuttle(1)).to.emit(childPool, 'ShuttleCancelled').withArgs(1);
+
+        expect(childPool.connect(user1).claim(1)).to.emit(childPool, 'TokenClaimed').withArgs(1, mockMaticToken.address, user1.address, amount);
+
+    });
+
 });
