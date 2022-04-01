@@ -38,7 +38,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      * @param _feeBeneficiary - Address to which fee will be transferred.
      * @param _owner - Address of the owner
      */
-    function init(
+    function initialize(
         IFxStateChildTunnel _childTunnel,
         IMaticToken _maticToken,
         IERC20 _stMaticToken,
