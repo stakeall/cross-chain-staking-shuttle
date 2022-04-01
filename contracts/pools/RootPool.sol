@@ -60,33 +60,34 @@ contract RootPool is IRootPool, PoolSecurityModule {
 
     /**
      *   Withdrawing Tokens from polyogon chain to mainnet is two step process. Step 1 is startExitWithBurntTokens.
-     *   Data argument is generate from matic.js with function `matic.exitUtil.buildPayloadForExit` by passing txhash and withdraw event signature. 
+     *   Data argument is generate from matic.js with function `matic.exitUtil.buildPayloadForExit` by passing txhash and withdraw event signature.
      *
-     * _burnTokenData Data generated from matic.js which is a proof that withdraw transaction happend on polygon chain. This data is only produced after 1 checkpoint. 
+     * _burnTokenData Data generated from matic.js which is a proof that withdraw transaction happend on polygon chain. This data is only produced after 1 checkpoint.
      */
     function startExitWithBurntTokens(bytes memory _burnTokenData)
         public
         onlyRole(OPERATOR_ROLE)
         whenNotPaused
     {
-        require(_burnTokenData.length> 0, "!data");
+        require(_burnTokenData.length > 0, "!data");
         erc20PredicateBurnOnly.startExitWithBurntTokens(_burnTokenData);
     }
+
     /**
-     * This method performs cross chain staking. 
+     * This method performs cross chain staking.
      * It recieves message sent by child tunnel, claims burned token on polygon chain, stake token to PoLido and bridge them back to child pool.
      *
-     * _messageReceiveData Data generated from matic.js which is a proof that Message is send by child tunnel to root tunnel from polygon chain. This data is only produced after 1 checkpoint. 
+     * _messageReceiveData Data generated from matic.js which is a proof that Message is send by child tunnel to root tunnel from polygon chain. This data is only produced after 1 checkpoint.
      *
      */
     function crossChainStake(bytes memory _messageReceiveData)
-        public
+        external
         onlyRole(OPERATOR_ROLE)
         whenNotPaused
     {
-        require(_messageReceiveData.length> 0, "!messageReceiveData");
+        require(_messageReceiveData.length > 0, "!messageReceiveData");
 
-        // recieve message send by child tunnel 
+        // recieve message send by child tunnel
         rootTunnel.receiveMessage(_messageReceiveData);
 
         // decode received message
@@ -94,7 +95,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
 
         uint256 beforeBalance = maticToken.balanceOf(address(this));
 
-        // Step 2 for claiming tokens send from polygon to ethereum 
+        // Step 2 for claiming tokens send from polygon to ethereum
         withdrawManagerProxy.processExits(address(maticToken));
 
         uint256 afterBalance = maticToken.balanceOf(address(this));
@@ -110,9 +111,69 @@ contract RootPool is IRootPool, PoolSecurityModule {
             amount
         );
         rootTunnel.sendMessageToChild(
-            abi.encode(shuttleNumber, stMaticAmount, ShuttleProcessingStatus.PROCESSED)
+            abi.encode(
+                shuttleNumber,
+                stMaticAmount,
+                ShuttleProcessingStatus.PROCESSED
+            )
         );
 
-        emit ShuttleProcessed(shuttleNumber, amount, stMaticAmount, ShuttleProcessingStatus.PROCESSED);
+        emit ShuttleProcessed(
+            shuttleNumber,
+            amount,
+            stMaticAmount,
+            ShuttleProcessingStatus.PROCESSED
+        );
+    }
+
+    /**
+     * This method cancels the shuttle.
+     * It recieves message sent by child tunnel, claims burned token on polygon chain, and bridge them back to child pool.
+     *
+     * _messageReceiveData Data generated from matic.js which is a proof that Message is send by child tunnel to root tunnel from polygon chain. This data is only produced after 1 checkpoint.
+     *
+     */
+    function cancelShuttle(bytes memory _messageReceiveData)
+        external
+        onlyRole(OPERATOR_ROLE)
+        whenNotPaused
+    {
+        require(_messageReceiveData.length > 0, "!messageReceiveData");
+
+        // recieve message send by child tunnel
+        rootTunnel.receiveMessage(_messageReceiveData);
+
+        // decode received message
+        (uint256 shuttleNumber, uint256 amount) = rootTunnel.readData();
+
+        uint256 beforeBalance = maticToken.balanceOf(address(this));
+
+        // Step 2 for claiming tokens send from polygon to ethereum
+        withdrawManagerProxy.processExits(address(maticToken));
+
+        uint256 afterBalance = maticToken.balanceOf(address(this));
+        uint256 effectiveBalance = afterBalance.sub(beforeBalance);
+
+        require(effectiveBalance >= amount, "Insufficient amount recieved");
+
+        maticToken.approve(address(depositManagerProxy), amount);
+
+        depositManagerProxy.depositERC20ForUser(
+            address(maticToken),
+            address(this),
+            amount
+        );
+
+        rootTunnel.sendMessageToChild(
+            abi.encode(shuttleNumber, amount, ShuttleProcessingStatus.CANCELLED)
+        );
+
+          emit ShuttleProcessed(
+            shuttleNumber,
+            amount,
+            0,
+            ShuttleProcessingStatus.CANCELLED
+        );
+
     }
 }
