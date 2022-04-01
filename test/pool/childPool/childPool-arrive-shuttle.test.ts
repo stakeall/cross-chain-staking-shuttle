@@ -184,7 +184,7 @@ describe("ChildPool.arriveShuttle", function () {
 
         await childPool.connect(owner).arriveShuttle(1);
 
-        await expect(childPool.connect(owner).arriveShuttle(1)).to.emit(childPool, 'ShuttleArrived').to.be.revertedWith("!Shuttle should be enrouted");
+        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith("!Shuttle should be enrouted");
     });
 
     it('should fail for non operator role', async () => {

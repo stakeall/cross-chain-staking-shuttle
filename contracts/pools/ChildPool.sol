@@ -186,6 +186,8 @@ contract ChildPool is IPool, PoolSecurityModule {
         );
 
         uint256 shuttleFee = 0;
+        // reset it so that next shuttle can be enrouted
+        enroutedShuttle = 0;
 
         if (shuttleProcessingStatus == ShuttleProcessingStatus.PROCESSED) {
             // make sure stMatic is arrived from bridge
@@ -199,10 +201,10 @@ contract ChildPool is IPool, PoolSecurityModule {
 
             shuttleFee = calculateFee(amount);
 
-            stMaticToken.transfer(feeBeneficiary, shuttleFee);
-
             shuttles[_shuttleNumber].recievedToken = amount.sub(shuttleFee);
             shuttles[_shuttleNumber].status = ShuttleStatus.ARRIVED;
+            
+            stMaticToken.transfer(feeBeneficiary, shuttleFee);
         } else if (
             shuttleProcessingStatus == ShuttleProcessingStatus.CANCELLED
         ) {
@@ -220,8 +222,6 @@ contract ChildPool is IPool, PoolSecurityModule {
             shuttles[_shuttleNumber].status = ShuttleStatus.CANCELLED;
         }
 
-        // reset it so that next shuttle can be enrouted
-        enroutedShuttle = 0;
 
         emit ShuttleArrived(
             shuttleNumber,
@@ -302,6 +302,29 @@ contract ChildPool is IPool, PoolSecurityModule {
                 balance
             );
         }
+    }
+
+    /**
+     * @dev If a shuttle is not enrouted after a specific block delay of `shuttleExpiry` then any one can call this function and mark shuttle as expired.
+     *      Once the shuttle is marked as expired, users can claim their deposited MATIC tokens. 
+     *
+     * @param _shuttleNumber Id of shuttle
+     *
+     */
+    function expireShuttle(uint256 _shuttleNumber) external {
+
+     Shuttle memory shuttle = shuttles[_shuttleNumber];
+
+        require(
+            shuttle.totalAmount > 0,
+            "!Not ready for expiry"
+        );
+
+        require(block.number >= shuttle.expiry, "!not ready to expire" );
+
+        shuttles[_shuttleNumber].status = ShuttleStatus.EXPIRED;
+
+        emit ShuttleExpired(_shuttleNumber);
     }
 
     /** Setter */

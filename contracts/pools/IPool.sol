@@ -37,6 +37,8 @@ contract IPool {
         address _beneficiary,
         uint256 _claimedAmount
     );
+
+    event ShuttleExpired(uint256 _shuttleNumber);
 }
 
 enum ShuttleProcessingStatus {
