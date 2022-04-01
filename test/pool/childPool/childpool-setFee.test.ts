@@ -15,9 +15,9 @@ describe("ChildPool.setFee", function () {
             owner.address,
             feeBeneficiary.address
         );
-
+        const newFee = 1000;
         const beforeFee = await  childPool.fee();
-        await childPool.connect(owner).setFee(1000);
+        await expect(childPool.connect(owner).setFee(newFee)).to.emit(childPool, 'FeeChanged').withArgs(newFee);
         const afterFee = await childPool.fee();
 
         expect(beforeFee).to.equals(500);

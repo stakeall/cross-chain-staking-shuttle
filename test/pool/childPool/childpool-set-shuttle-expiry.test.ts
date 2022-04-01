@@ -17,7 +17,8 @@ describe("ChildPool.setShuttleExpiry", function () {
         );
 
         const beforeShuttleExpiry = await  childPool.shuttleExpiry();
-        await childPool.connect(owner).setShuttleExpiry(1000);
+        const newExpiry = 1000;
+        await expect(childPool.connect(owner).setShuttleExpiry(newExpiry)).to.emit(childPool, 'ShuttleExpiryChanged').withArgs(newExpiry);;
         const afterShuttleExpiry = await childPool.shuttleExpiry();
 
         expect(beforeShuttleExpiry).to.equals(2000);
