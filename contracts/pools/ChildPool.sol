@@ -359,6 +359,16 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         fee = _fee;
     }
 
+    /**
+     *
+     * @dev Set's the shuttle expiry blocks.
+     *
+     * @param _shuttleExpiry shuttle expiry in blocks.
+     */
+    function setShuttleExpiry(uint256 _shuttleExpiry) external onlyRole(GOVERNANCE_ROLE) {
+        shuttleExpiry = _shuttleExpiry;
+    }
+
     //todo decide on receive vs fallback
     receive() external payable {}
 }
