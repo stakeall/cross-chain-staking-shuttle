@@ -3,14 +3,13 @@ pragma solidity ^0.8.3;
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./IPool.sol";
-import {IFxStateChildTunnel} from "./IPool.sol";
+import "./IChildPool.sol";
 import "./PoolSecurityModule.sol";
 
 /**
  * Manages user deposits for staking on child chain.
  */
-contract ChildPool is IPool, PoolSecurityModule {
+contract ChildPool is IChildPool, PoolSecurityModule {
     using SafeMath for uint256;
 
     IFxStateChildTunnel public childTunnel;
