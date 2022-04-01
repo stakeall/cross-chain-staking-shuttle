@@ -324,6 +324,7 @@ contract ChildPool is IPool, PoolSecurityModule {
 
         shuttles[_shuttleNumber].status = ShuttleStatus.EXPIRED;
 
+        createNewShuttle();
         emit ShuttleExpired(_shuttleNumber);
     }
 
