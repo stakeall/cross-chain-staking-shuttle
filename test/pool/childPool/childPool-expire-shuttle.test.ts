@@ -89,7 +89,7 @@ describe("ChildPool.expireShuttle", function () {
 
 
         const wrongShuttleId = 10;
-        await expect(childPool.connect(user1).expireShuttle(wrongShuttleId)).to.be.revertedWith("!Not ready for expiry");
+        await expect(childPool.connect(user1).expireShuttle(wrongShuttleId)).to.be.revertedWith("!only current shuttle allowed");
     });
 
     it('should allow deposit of funds to next shuttle if current shuttle is expired ', async() => {
