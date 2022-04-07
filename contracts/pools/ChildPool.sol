@@ -38,7 +38,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      * @param _feeBeneficiary - Address to which fee will be transferred.
      * @param _owner - Address of the owner
      */
-    function init(
+    function initialize(
         IFxStateChildTunnel _childTunnel,
         IMaticToken _maticToken,
         IERC20 _stMaticToken,
@@ -196,11 +196,14 @@ contract ChildPool is IChildPool, PoolSecurityModule {
                 "!insufficient stMatic balance"
             );
 
-            availableStMaticBalance = availableStMaticBalance.add(amount);
+            uint256 recievedToken = amount.sub(shuttleFee);
+            availableStMaticBalance = availableStMaticBalance.add(
+                recievedToken
+            );
 
             shuttleFee = calculateFee(amount);
 
-            shuttles[_shuttleNumber].recievedToken = amount.sub(shuttleFee);
+            shuttles[_shuttleNumber].recievedToken = recievedToken;
             shuttles[_shuttleNumber].status = ShuttleStatus.ARRIVED;
 
             stMaticToken.transfer(feeBeneficiary, shuttleFee);
@@ -366,11 +369,17 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      *
      * @param _shuttleExpiry shuttle expiry in blocks.
      */
-    function setShuttleExpiry(uint256 _shuttleExpiry) external onlyRole(GOVERNANCE_ROLE) {
+    function setShuttleExpiry(uint256 _shuttleExpiry)
+        external
+        onlyRole(GOVERNANCE_ROLE)
+    {
         shuttleExpiry = _shuttleExpiry;
         emit ShuttleExpiryChanged(shuttleExpiry);
     }
 
     //todo decide on receive vs fallback
     receive() external payable {}
+
+    fallback() external payable {}
+
 }

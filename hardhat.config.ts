@@ -29,11 +29,8 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: "0.8.0",
-      },
-      {
         version: "0.8.3",
-      },
+      }
     ],
   },
   networks: {
@@ -52,6 +49,9 @@ module.exports = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    localhost: {
+      url: "http://localhost:8545"
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

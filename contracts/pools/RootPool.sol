@@ -23,13 +23,13 @@ contract RootPool is IRootPool, PoolSecurityModule {
      * @param _rootTunnel - Address of the child tunnel.
      * @param _withdrawManagerProxy - Address of MATIC token on Polygon Mainnet
      * @param _erc20PredicateBurnOnly - Address of stMatic on Polygon Mainnet
-     * @param _depositManagerProxy - Expiry of shuttle in blocks
+     * @param _depositManagerProxy Deposit Manager proxy address 
      * @param _erc20PredicateProxy - Address of the owner
      * @param _polidoAdapter - Address of the owner
      * @param _maticToken - Address of the owner
      * @param _owner - Address of the owner
      */
-    function init(
+    function initialize(
         IFxStateRootTunnel _rootTunnel,
         IWithdrawManagerProxy _withdrawManagerProxy,
         IERC20PredicateBurnOnly _erc20PredicateBurnOnly,

@@ -13,7 +13,12 @@
     "deploy_polido_adapter_mainnet": "npx hardhat run scripts/deploy_polido_adapter.js --network mainnet",
     "deploy_polido_adapter_localhost": "npx hardhat run scripts/deploy_polido_adapter.js --network localhost",
     "upgrade_polido_adapter_goerli": "npx hardhat run scripts/upgrade_polido_adapter.js --network goerli",
-    "upgrade_polido_adapter_mainnet": "npx hardhat run scripts/upgrade_polido_adapter.js --network mainnet"
+    "upgrade_polido_adapter_mainnet": "npx hardhat run scripts/upgrade_polido_adapter.js --network mainnet",
+    "deploy-pool-goerli": "npx hardhat run scripts/deploy_staking_pools.js --network goerli",
+    "deploy-pool-mumbai": "npx hardhat run scripts/deploy_staking_pools.js --network mumbai",
+    "upgrade-pool-goerli": "npx hardhat run scripts/upgrade_pools.js --network goerli",
+    "upgrade-pool-mumbai": "npx hardhat run scripts/upgrade_pools.js --network mumbai"
+  
   },
   "devDependencies": {
     "@ethersproject/bignumber": "5.6.0",
