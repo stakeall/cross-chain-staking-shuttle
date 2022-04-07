@@ -16,6 +16,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
     address public erc20PredicateProxy;
     IPolidoAdapter public polidoAdapter;
     IERC20 public maticToken;
+    address public childPoolFundCollector;
 
     /**
      * Initialize the contract and setup roles.
@@ -27,6 +28,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
      * @param _erc20PredicateProxy - Address of the owner
      * @param _polidoAdapter - Address of the owner
      * @param _maticToken - Address of the owner
+     * @param _childPoolFundCollector - Address of childPool fund collector
      * @param _owner - Address of the owner
      */
     function initialize(
@@ -37,6 +39,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
         address _erc20PredicateProxy,
         IPolidoAdapter _polidoAdapter,
         IERC20 _maticToken,
+        address _childPoolFundCollector,
         address _owner
     ) public initializer {
         __AccessControl_init();
@@ -50,6 +53,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
         erc20PredicateProxy = _erc20PredicateProxy;
         polidoAdapter = _polidoAdapter;
         maticToken = _maticToken;
+        childPoolFundCollector = _childPoolFundCollector;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _owner);
         _setupRole(OPERATOR_ROLE, _owner);
@@ -160,7 +164,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
 
         depositManagerProxy.depositERC20ForUser(
             address(maticToken),
-            address(this),
+            childPoolFundCollector,
             amount
         );
 
