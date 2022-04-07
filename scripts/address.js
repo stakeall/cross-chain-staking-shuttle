@@ -5,6 +5,7 @@ const addresses = {
     rootTunnel: "",
     withdrawManagerProxy: "",
     erc20PredicateBurnOnly: "",
+    depositManagerProxy: "",
     erc20PredicateProxy: "",
     poLidoAdapter: "",
     maticToken: "",
@@ -16,11 +17,12 @@ const addresses = {
     rootTunnel: "0x7C71Db903752Df85dc4aB23b5E8fdb9e416a50c7",
     withdrawManagerProxy: "0x2923C8dD6Cdf6b2507ef91de74F1d5E0F11Eac53",
     erc20PredicateBurnOnly: "0xf213e8fF5d797ed2B052D3b96C11ac71dB358027",
+    depositManagerProxy: "0x7850ec290A2e2F40B82Ed962eaf30591bb5f5C96",
     erc20PredicateProxy: "0xdD6596F2029e6233DEFfaCa316e6A95217d4Dc34",
     poLidoAdapter: "0xf8bb8087F9967Edf6B0D26D146fA978A953EC2A5",
     maticToken: "0x499d11e0b6eac7c0593d8fb292dcbbf815fb29ae",
     rootPoolOwner: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
-    rootPoolProxy: "0xd4d86841f6A406cEEDC78B6aAbEA477C1c06EFA6",
+    rootPoolProxy: "0x970A6E129bDC87ce7838dC0C5C066C88AdDCa35e",
   },
   137: {
     fxChild: "0x8397259c983751DAf40400790063935a11afa28a",
@@ -41,7 +43,7 @@ const addresses = {
     shuttleExpiry: 10,
     feeBeneficiary: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
     childPoolOwner: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
-    childPoolProxy: "0xd4d86841f6A406cEEDC78B6aAbEA477C1c06EFA6",
+    childPoolProxy: "0x970A6E129bDC87ce7838dC0C5C066C88AdDCa35e",
   },
 };
 

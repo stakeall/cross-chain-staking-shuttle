@@ -22,6 +22,7 @@ async function main() {
   const rootTunnel = addresses[chainId].rootTunnel;
   const withdrawManagerProxy = addresses[chainId].withdrawManagerProxy;
   const erc20PredicateBurnOnly = addresses[chainId].erc20PredicateBurnOnly;
+  const depositManagerProxy = addresses[chainId].depositManagerProxy;
   const erc20PredicateProxy = addresses[chainId].erc20PredicateProxy;
   const poLidoAdapter = addresses[chainId].poLidoAdapter;
   const maticToken = addresses[chainId].maticToken;
@@ -35,6 +36,7 @@ async function main() {
       rootTunnel,
       withdrawManagerProxy,
       erc20PredicateBurnOnly,
+      depositManagerProxy,
       erc20PredicateProxy,
       poLidoAdapter,
       maticToken,
@@ -56,15 +58,19 @@ async function main() {
 
     const ChildPool = await ethers.getContractFactory("ChildPool");
 
-    const childPool = await upgrades.deployProxy(ChildPool, [
-      childTunnel,
-      maticTokenOnChild,
-      stMaticToken,
-      shuttleExpiry,
-      fee,
-      feeBeneficiary,
-      childPoolOwner,
-    ]);
+    const childPool = await upgrades.deployProxy(
+      ChildPool,
+      [
+        childTunnel,
+        maticTokenOnChild,
+        stMaticToken,
+        shuttleExpiry,
+        fee,
+        feeBeneficiary,
+        childPoolOwner,
+      ],
+      { kind: "uups" }
+    );
     await childPool.deployed();
     console.log("childPool Proxy deployed to:", childPool.address);
   }
