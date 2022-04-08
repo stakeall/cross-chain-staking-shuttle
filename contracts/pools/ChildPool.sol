@@ -33,8 +33,8 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      *
      * @param _childTunnel - Address of the child tunnel.
      * @param _maticToken - Address of MATIC token on Polygon Mainnet
-     * @param _fundCollector - Address of fund collector contract
      * @param _stMaticToken - Address of stMatic on Polygon Mainnet
+     * @param _fundCollector - Address of fund collector contract
      * @param _shuttleExpiry - Expiry of shuttle in blocks
      * @param _fee - Fee percentange on base 10000 that will be charged on successful arrival of shuttle.
      * @param _feeBeneficiary - Address to which fee will be transferred.
@@ -43,8 +43,8 @@ contract ChildPool is IChildPool, PoolSecurityModule {
     function initialize(
         IFxStateChildTunnel _childTunnel,
         IMaticToken _maticToken,
-        IFundCollector _fundCollector, 
         IERC20 _stMaticToken,
+        IFundCollector _fundCollector, 
         uint256 _shuttleExpiry,
         uint256 _fee,
         address _feeBeneficiary,

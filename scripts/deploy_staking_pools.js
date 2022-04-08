@@ -26,6 +26,7 @@ async function main() {
   const erc20PredicateProxy = addresses[chainId].erc20PredicateProxy;
   const poLidoAdapter = addresses[chainId].poLidoAdapter;
   const maticToken = addresses[chainId].maticToken;
+  const childPoolFundCollector = addresses[chainId].childPoolFundCollector;
   const rootPoolOwner = addresses[chainId].rootPoolOwner;
 
   // Deploy rootPool
@@ -40,6 +41,7 @@ async function main() {
       erc20PredicateProxy,
       poLidoAdapter,
       maticToken,
+      childPoolFundCollector,
       rootPoolOwner,
     ]);
     await rootPool.deployed();
@@ -51,6 +53,7 @@ async function main() {
     const childTunnel = addresses[chainId].childTunnel;
     const maticTokenOnChild = addresses[chainId].maticTokenOnChild;
     const stMaticToken = addresses[chainId].stMaticToken;
+    const fundCollector = addresses[chainId].fundCollector;
     const fee = addresses[chainId].fee;
     const feeBeneficiary = addresses[chainId].feeBeneficiary;
     const childPoolOwner = addresses[chainId].childPoolOwner;
@@ -58,19 +61,16 @@ async function main() {
 
     const ChildPool = await ethers.getContractFactory("ChildPool");
 
-    const childPool = await upgrades.deployProxy(
-      ChildPool,
-      [
-        childTunnel,
-        maticTokenOnChild,
-        stMaticToken,
-        shuttleExpiry,
-        fee,
-        feeBeneficiary,
-        childPoolOwner,
-      ],
-      { kind: "uups" }
-    );
+    const childPool = await upgrades.deployProxy(ChildPool, [
+      childTunnel,
+      maticTokenOnChild,
+      stMaticToken,
+      fundCollector,
+      shuttleExpiry,
+      fee,
+      feeBeneficiary,
+      childPoolOwner,
+    ]);
     await childPool.deployed();
     console.log("childPool Proxy deployed to:", childPool.address);
   }
