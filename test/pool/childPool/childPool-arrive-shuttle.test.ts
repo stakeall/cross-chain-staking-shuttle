@@ -35,7 +35,6 @@ describe("ChildPool.arriveShuttle", function () {
 
         const shuttleObject = await childPool.shuttles(1);
         expect(shuttleObject.status).to.equals(ShuttleStatus.ARRIVED);
-        
         expect(shuttleObject.recievedToken).to.equals(BigNumber.from(shuttleArrivalData.stMaticAmount).sub(BigNumber.from(fee)));
         const feeBeneficiaryStMaticBalance = await stMaticToken.balanceOf(deployer.address);
 
@@ -47,7 +46,7 @@ describe("ChildPool.arriveShuttle", function () {
         const [deployer, owner, user1, user2] = await ethers.getSigners();
 
         // deploy child pool
-        const { childPool, mockFxStateChildTunnel } = await getShuttleInEnrouteState(deployer, 2000, owner, user1, user2);
+        const { childPool, mockFxStateChildTunnel, fundCollector } = await getShuttleInEnrouteState(deployer, 2000, owner, user1, user2);
 
         const shuttleArrivalData = {
             stMaticAmount: ethers.utils.parseEther("3"),
@@ -64,7 +63,7 @@ describe("ChildPool.arriveShuttle", function () {
         await mockFxStateChildTunnel.setLatestData(encodedMessageData);
         // mock token arrival 
         await deployer.sendTransaction({
-            to: childPool.address,
+            to: fundCollector.address,
             value: shuttleArrivalData.stMaticAmount,
             from: deployer.address
         })
@@ -128,7 +127,7 @@ describe("ChildPool.arriveShuttle", function () {
         // mock message arrival 
         await mockFxStateChildTunnel.setLatestData(encodedMessageData);
 
-        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith("!insufficient Matic balance");
+        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith("!enough funds");
     });
 
     it('should fail to arrive shuttle in case of message is not recieved from tunnels', async () => {

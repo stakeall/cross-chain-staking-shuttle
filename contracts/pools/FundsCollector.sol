@@ -27,7 +27,7 @@ contract FundsCollector is Ownable {
 
         uint256 balance = address(this).balance;
 
-        require(balance >= _amount, "insufficient funds");
+        require(balance >= _amount, "!enough funds");
 
         // solium-disable-next-line security/no-call-value
         (bool sent, ) = childPool.call{value: _amount}("");

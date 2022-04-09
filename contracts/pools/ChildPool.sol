@@ -200,12 +200,11 @@ contract ChildPool is IChildPool, PoolSecurityModule {
                 "!insufficient stMatic balance"
             );
 
+            shuttleFee = calculateFee(amount);
             uint256 recievedToken = amount.sub(shuttleFee);
             availableStMaticBalance = availableStMaticBalance.add(
                 recievedToken
             );
-
-            shuttleFee = calculateFee(amount);
 
             shuttles[_shuttleNumber].recievedToken = recievedToken;
             shuttles[_shuttleNumber].status = ShuttleStatus.ARRIVED;

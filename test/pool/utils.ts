@@ -13,16 +13,26 @@ export const deployChildPool = async (
     const mockFxStateChildTunnel = await deployMockFxStateChildTunnel(deployer);
     const stMaticToken = await deployMockERC20(deployer);
 
+    const FundCollector = await ethers.getContractFactory(
+        "FundsCollector"
+    );
+
+    const fundCollector = await FundCollector.connect(deployer).deploy();
+    await fundCollector.deployed();
+    
     const ChildPool = await ethers.getContractFactory(
         "ChildPool"
     );
     const childPool = await ChildPool.connect(deployer).deploy();
     await childPool.deployed();
 
-    const initPool = await childPool.connect(deployer).init(
+    await fundCollector.setChildPool(childPool.address);
+
+    const initPool = await childPool.connect(deployer).initialize(
         mockFxStateChildTunnel.address,
         mockMaticToken.address,
         stMaticToken.address,
+        fundCollector.address,
         shuttleExpiry,
         fee,
         feeBeneficiary,
@@ -31,7 +41,7 @@ export const deployChildPool = async (
     await initPool.wait();
 
 
-    return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken };
+    return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken, fundCollector };
 }
 
 export const getShuttleInEnrouteState = async (
@@ -41,7 +51,7 @@ export const getShuttleInEnrouteState = async (
     user1: SignerWithAddress,
     user2: SignerWithAddress
 ) => {
-    const { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken } = await deployChildPool(deployer, shuttleExpiry, owner.address, deployer.address);
+    const { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken, fundCollector } = await deployChildPool(deployer, shuttleExpiry, owner.address, deployer.address);
 
     let amount = ethers.utils.parseEther("1");
     await childPool.connect(user1).deposit(amount, {
@@ -57,7 +67,7 @@ export const getShuttleInEnrouteState = async (
 
     await childPool.connect(owner).enrouteShuttle(1)
 
-    return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken };
+    return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken, fundCollector };
 }
 
 export const getShuttleInArrivedState = async (
@@ -69,7 +79,7 @@ export const getShuttleInArrivedState = async (
     status: ShuttleProcessingStatus = ShuttleProcessingStatus.PROCESSED,
     depositAmount: string = "2"
 ) => {
-    const { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken } = await getShuttleInEnrouteState(deployer, shuttleExpiry, owner, user1, user2);
+    const { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken, fundCollector } = await getShuttleInEnrouteState(deployer, shuttleExpiry, owner, user1, user2);
 
     const shuttleArrivalData = {
         stMaticAmount: ethers.utils.parseEther(depositAmount || "2"),
@@ -90,7 +100,7 @@ export const getShuttleInArrivedState = async (
     } else {
         // mock token arrival 
         await deployer.sendTransaction({
-            to: childPool.address,
+            to: fundCollector.address,
             value: shuttleArrivalData.stMaticAmount,
             from: deployer.address
         })
@@ -99,7 +109,7 @@ export const getShuttleInArrivedState = async (
 
     await childPool.connect(owner).arriveShuttle(1);
 
-    return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken };
+    return { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken, fundCollector };
 
 }
 
