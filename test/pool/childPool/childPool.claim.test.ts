@@ -11,6 +11,7 @@ describe("ChildPool.claim", function () {
         const [deployer, owner, user1, user2] = await ethers.getSigners();
 
         // deploy child pool
+        const arrivedStMatic = '2';
         const { childPool , stMaticToken } = await getShuttleInArrivedState(
             deployer,
             2000,
@@ -18,10 +19,10 @@ describe("ChildPool.claim", function () {
             user1,
             user2,
             ShuttleProcessingStatus.PROCESSED,
-            "2"
+            arrivedStMatic
         );
 
-        const stMaticAmount = BigNumber.from(ethers.utils.parseEther("2"));
+        const stMaticAmount = BigNumber.from(ethers.utils.parseEther(arrivedStMatic));
 
         const shuttle = await childPool.shuttles(1);
         const totalAmount = BigNumber.from(shuttle.totalAmount);
@@ -33,16 +34,20 @@ describe("ChildPool.claim", function () {
         const expectedStMaticAmountUser1 = user1Deposit.mul(recievedAmount).div(totalAmount);
         const expectedStMaticAmountUser2 = user2Deposit.mul(recievedAmount).div(totalAmount);
         
+        const fee =
+            BigNumber.from(500).mul(BigNumber.from(stMaticAmount)).div(BigNumber.from(10000));
+
         let availableStMaticBalance = await childPool.availableStMaticBalance();
-        expect(availableStMaticBalance).that.equals(ethers.utils.parseEther("2"));
+        const expectedStMaticBalance = ethers.utils.parseEther("2").sub(fee);
+        expect(availableStMaticBalance).that.equals(expectedStMaticBalance);
 
         await expect(childPool.connect(user1).claim(1)).to.emit(childPool, 'TokenClaimed').withArgs(1, stMaticToken.address, user1.address, expectedStMaticAmountUser1);
         availableStMaticBalance = await childPool.availableStMaticBalance();
-        expect(availableStMaticBalance).that.equals(stMaticAmount.sub(BigNumber.from(expectedStMaticAmountUser1)));
+        expect(availableStMaticBalance).that.equals(expectedStMaticBalance.sub(BigNumber.from(expectedStMaticAmountUser1)));
 
         await expect(childPool.connect(user2).claim(1)).to.emit(childPool, 'TokenClaimed').withArgs(1, stMaticToken.address, user2.address, expectedStMaticAmountUser2);
         availableStMaticBalance = await childPool.availableStMaticBalance();
-        expect(availableStMaticBalance).that.equals(stMaticAmount.sub(BigNumber.from(expectedStMaticAmountUser1).add(BigNumber.from(expectedStMaticAmountUser2))));
+        expect(availableStMaticBalance).that.equals(expectedStMaticBalance.sub(BigNumber.from(expectedStMaticAmountUser1).add(BigNumber.from(expectedStMaticAmountUser2))));
     });
 
     it('should let user claim deposited matic funds after shuttle in cancelled', async() => {

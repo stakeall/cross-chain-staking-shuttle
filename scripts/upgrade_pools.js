@@ -13,7 +13,6 @@ async function main() {
     const RootPool = await ethers.getContractFactory("RootPool");
 
     const proxy = addresses[chainId].rootPoolProxy;
-    console.log({proxy});
 
     await upgrades.upgradeProxy(proxy, RootPool);
   } else {

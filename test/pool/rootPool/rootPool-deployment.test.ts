@@ -9,12 +9,12 @@ describe("RootPool.init", function () {
             "RootPool"
         );
 
-        const [deployer, owner, rootTunnel, withdrawManagerProxy, erc20PredicateBurnOnly, depositManagerProxy, erc20PredicateProxy, polidoAdapter, maticToken] = await ethers.getSigners();
+        const [deployer, owner, rootTunnel, withdrawManagerProxy, erc20PredicateBurnOnly, depositManagerProxy, erc20PredicateProxy, polidoAdapter, maticToken, childPoolFundCollector] = await ethers.getSigners();
 
         const rootPool = await RootPool.connect(deployer).deploy();
         await rootPool.deployed();
 
-        const initPool = await rootPool.connect(deployer).init(
+        const initPool = await rootPool.connect(deployer).initialize(
             rootTunnel.address,
             withdrawManagerProxy.address,
             erc20PredicateBurnOnly.address,
@@ -22,6 +22,7 @@ describe("RootPool.init", function () {
             erc20PredicateProxy.address,
             polidoAdapter.address,
             maticToken.address,
+            childPoolFundCollector.address,
             owner.address
         );
 
@@ -36,6 +37,7 @@ describe("RootPool.init", function () {
         expect(await rootPool.erc20PredicateProxy()).to.equal(erc20PredicateProxy.address);
         expect(await rootPool.polidoAdapter()).to.equal(polidoAdapter.address);
         expect(await rootPool.maticToken()).to.equal(maticToken.address);
+        expect(await rootPool.childPoolFundCollector()).to.equal(childPoolFundCollector.address);
         
         // validate roles owner has all the roles
         expect(await rootPool.hasRole(await rootPool.DEFAULT_ADMIN_ROLE(), owner.address)).to.equal(true);

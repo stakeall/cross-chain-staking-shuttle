@@ -1,20 +1,25 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0x29eC3C232D6F31Da75979dc749548759bB170664",
-    "txHash": "0x1b063b0beab83b14e5690c02ff1da3e97cef039fbc5878b4e0766ecd35286d81"
+    "address": "0xdA321db4FD609d1A497356C82515e19cd6fd0353",
+    "txHash": "0x0a9c99be3abe09198686eed868a457205c2d36e74c8c53114fe9a3340ebf8423"
   },
   "proxies": [
     {
-      "address": "0xd4d86841f6A406cEEDC78B6aAbEA477C1c06EFA6",
-      "txHash": "0xf19dc9d093e54ec5dd45ceff818b514462f06b91e5cc23915f29c86c6ff4c8e0",
+      "address": "0x6564b59C8c8d33657e30f4AaC2204DaE89477c4B",
+      "txHash": "0xe54662eda7ff994eab7abac1f36cf44ffeef4ae1eefd2b8b9f3fb29ff4190f49",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x110e5b163F833d9f5BD7bf1ce5433e2Dd4A3c3c4",
+      "txHash": "0xc2d708bb6915e488ca2d9d75376b6c28e136d9aa39d15dc5f60215ca75153a79",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "2a46cf4c5d0f90b88e1695ace6e2f5a3d55aa24ee8ee7b7f842dc34efe1749d3": {
-      "address": "0x0B5C6C42AEf4252e435f0B6eE2032c62F5220b3E",
-      "txHash": "0x35ce0af5cbcf120092a9b2e24fcca03296e80bd8845517f2c26e40636e0e6ae5",
+    "dd5cf7daf8d902bdc9855ca1cc858b97290e81b0435132c4a0dc5c8955ba4730": {
+      "address": "0xa7041748f6aAC539EFd140b025eEE0DdcF3a2b14",
+      "txHash": "0x2a23348e7088c8192020eb95ff58c7fbd87ace4454990323886a4bff1de3aca9",
       "layout": {
         "storage": [
           {
@@ -101,7 +106,7 @@
             "label": "childTunnel",
             "offset": 0,
             "slot": "251",
-            "type": "t_contract(IFxStateChildTunnel)7396",
+            "type": "t_contract(IFxStateChildTunnel)7507",
             "contract": "ChildPool",
             "src": "contracts/pools/ChildPool.sol:15"
           },
@@ -109,7 +114,7 @@
             "label": "maticToken",
             "offset": 0,
             "slot": "252",
-            "type": "t_contract(IMaticToken)7402",
+            "type": "t_contract(IMaticToken)7513",
             "contract": "ChildPool",
             "src": "contracts/pools/ChildPool.sol:16"
           },
@@ -122,15 +127,15 @@
             "src": "contracts/pools/ChildPool.sol:17"
           },
           {
-            "label": "shuttleExpiry",
+            "label": "fundCollector",
             "offset": 0,
             "slot": "254",
-            "type": "t_uint256",
+            "type": "t_contract(IFundCollector)7519",
             "contract": "ChildPool",
             "src": "contracts/pools/ChildPool.sol:18"
           },
           {
-            "label": "currentShuttle",
+            "label": "shuttleExpiry",
             "offset": 0,
             "slot": "255",
             "type": "t_uint256",
@@ -138,7 +143,7 @@
             "src": "contracts/pools/ChildPool.sol:19"
           },
           {
-            "label": "enroutedShuttle",
+            "label": "currentShuttle",
             "offset": 0,
             "slot": "256",
             "type": "t_uint256",
@@ -146,7 +151,7 @@
             "src": "contracts/pools/ChildPool.sol:20"
           },
           {
-            "label": "availableMaticBalance",
+            "label": "enroutedShuttle",
             "offset": 0,
             "slot": "257",
             "type": "t_uint256",
@@ -154,7 +159,7 @@
             "src": "contracts/pools/ChildPool.sol:21"
           },
           {
-            "label": "availableStMaticBalance",
+            "label": "availableMaticBalance",
             "offset": 0,
             "slot": "258",
             "type": "t_uint256",
@@ -162,7 +167,7 @@
             "src": "contracts/pools/ChildPool.sol:22"
           },
           {
-            "label": "fee",
+            "label": "availableStMaticBalance",
             "offset": 0,
             "slot": "259",
             "type": "t_uint256",
@@ -170,28 +175,36 @@
             "src": "contracts/pools/ChildPool.sol:23"
           },
           {
-            "label": "feeBeneficiary",
+            "label": "fee",
             "offset": 0,
             "slot": "260",
-            "type": "t_address",
+            "type": "t_uint256",
             "contract": "ChildPool",
             "src": "contracts/pools/ChildPool.sol:24"
           },
           {
-            "label": "shuttles",
+            "label": "feeBeneficiary",
             "offset": 0,
             "slot": "261",
-            "type": "t_mapping(t_uint256,t_struct(Shuttle)7321_storage)",
+            "type": "t_address",
             "contract": "ChildPool",
-            "src": "contracts/pools/ChildPool.sol:27"
+            "src": "contracts/pools/ChildPool.sol:25"
+          },
+          {
+            "label": "shuttles",
+            "offset": 0,
+            "slot": "262",
+            "type": "t_mapping(t_uint256,t_struct(Shuttle)7432_storage)",
+            "contract": "ChildPool",
+            "src": "contracts/pools/ChildPool.sol:28"
           },
           {
             "label": "balances",
             "offset": 0,
-            "slot": "262",
+            "slot": "263",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))",
             "contract": "ChildPool",
-            "src": "contracts/pools/ChildPool.sol:28"
+            "src": "contracts/pools/ChildPool.sol:29"
           }
         ],
         "types": {
@@ -219,15 +232,19 @@
             "label": "contract IERC20",
             "numberOfBytes": "20"
           },
-          "t_contract(IFxStateChildTunnel)7396": {
+          "t_contract(IFundCollector)7519": {
+            "label": "contract IFundCollector",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IFxStateChildTunnel)7507": {
             "label": "contract IFxStateChildTunnel",
             "numberOfBytes": "20"
           },
-          "t_contract(IMaticToken)7402": {
+          "t_contract(IMaticToken)7513": {
             "label": "contract IMaticToken",
             "numberOfBytes": "20"
           },
-          "t_enum(ShuttleStatus)7311": {
+          "t_enum(ShuttleStatus)7422": {
             "label": "enum IChildPool.ShuttleStatus",
             "members": [
               "AVAILABLE",
@@ -254,7 +271,7 @@
             "label": "mapping(uint256 => mapping(address => uint256))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(Shuttle)7321_storage)": {
+          "t_mapping(t_uint256,t_struct(Shuttle)7432_storage)": {
             "label": "mapping(uint256 => struct IChildPool.Shuttle)",
             "numberOfBytes": "32"
           },
@@ -276,7 +293,7 @@
             ],
             "numberOfBytes": "64"
           },
-          "t_struct(Shuttle)7321_storage": {
+          "t_struct(Shuttle)7432_storage": {
             "label": "struct IChildPool.Shuttle",
             "members": [
               {
@@ -287,7 +304,7 @@
               },
               {
                 "label": "status",
-                "type": "t_enum(ShuttleStatus)7311",
+                "type": "t_enum(ShuttleStatus)7422",
                 "offset": 0,
                 "slot": "1"
               },

@@ -11,8 +11,13 @@
       "kind": "transparent"
     },
     {
-      "address": "0xd4d86841f6A406cEEDC78B6aAbEA477C1c06EFA6",
-      "txHash": "0x7730fa99e05767e2c1a9c07f8ff1663b1f5141793588bc71896b8a2240ff7c65",
+      "address": "0xdA321db4FD609d1A497356C82515e19cd6fd0353",
+      "txHash": "0x9d1d785fcfb218e84c380a7ed4778d8e378d6a58806bfd6cc617fe8ccd52c4af",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x110e5b163F833d9f5BD7bf1ce5433e2Dd4A3c3c4",
+      "txHash": "0xb8abed3b3a9870925a88af67ea6cb484ada4c159fde549bb271ba5c2ea66ac15",
       "kind": "transparent"
     }
   ],
@@ -173,9 +178,9 @@
         }
       }
     },
-    "646bbf48210ea8a4a2d343831d60e44af131f917a5a62154c8c35b4c36e511b8": {
-      "address": "0x0B5C6C42AEf4252e435f0B6eE2032c62F5220b3E",
-      "txHash": "0xa7351443e00f67d9a56fe3b8f5211baeb724e794807ccb65cea0e5f7cd935dd5",
+    "bf46877caecd8c1c3247748fc71d5feaa6b897aa875ae5242503a860daf8d2d1": {
+      "address": "0xa7041748f6aAC539EFd140b025eEE0DdcF3a2b14",
+      "txHash": "0xb6414c26644cde83637586f03d46b14864ea0f57e9bbd0add5de3cd11de7ba36",
       "layout": {
         "storage": [
           {
@@ -262,7 +267,7 @@
             "label": "rootTunnel",
             "offset": 0,
             "slot": "251",
-            "type": "t_contract(IFxStateRootTunnel)7437",
+            "type": "t_contract(IFxStateRootTunnel)7554",
             "contract": "RootPool",
             "src": "contracts/pools/RootPool.sol:12"
           },
@@ -270,7 +275,7 @@
             "label": "withdrawManagerProxy",
             "offset": 0,
             "slot": "252",
-            "type": "t_contract(IWithdrawManagerProxy)7443",
+            "type": "t_contract(IWithdrawManagerProxy)7560",
             "contract": "RootPool",
             "src": "contracts/pools/RootPool.sol:13"
           },
@@ -278,7 +283,7 @@
             "label": "erc20PredicateBurnOnly",
             "offset": 0,
             "slot": "253",
-            "type": "t_contract(IERC20PredicateBurnOnly)7449",
+            "type": "t_contract(IERC20PredicateBurnOnly)7566",
             "contract": "RootPool",
             "src": "contracts/pools/RootPool.sol:14"
           },
@@ -286,7 +291,7 @@
             "label": "depositManagerProxy",
             "offset": 0,
             "slot": "254",
-            "type": "t_contract(IDepositManagerProxy)7459",
+            "type": "t_contract(IDepositManagerProxy)7576",
             "contract": "RootPool",
             "src": "contracts/pools/RootPool.sol:15"
           },
@@ -302,7 +307,7 @@
             "label": "polidoAdapter",
             "offset": 0,
             "slot": "256",
-            "type": "t_contract(IPolidoAdapter)7469",
+            "type": "t_contract(IPolidoAdapter)7586",
             "contract": "RootPool",
             "src": "contracts/pools/RootPool.sol:17"
           },
@@ -313,6 +318,14 @@
             "type": "t_contract(IERC20)2389",
             "contract": "RootPool",
             "src": "contracts/pools/RootPool.sol:18"
+          },
+          {
+            "label": "childPoolFundCollector",
+            "offset": 0,
+            "slot": "258",
+            "type": "t_address",
+            "contract": "RootPool",
+            "src": "contracts/pools/RootPool.sol:19"
           }
         ],
         "types": {
@@ -336,7 +349,7 @@
             "label": "bytes32",
             "numberOfBytes": "32"
           },
-          "t_contract(IDepositManagerProxy)7459": {
+          "t_contract(IDepositManagerProxy)7576": {
             "label": "contract IDepositManagerProxy",
             "numberOfBytes": "20"
           },
@@ -344,19 +357,19 @@
             "label": "contract IERC20",
             "numberOfBytes": "20"
           },
-          "t_contract(IERC20PredicateBurnOnly)7449": {
+          "t_contract(IERC20PredicateBurnOnly)7566": {
             "label": "contract IERC20PredicateBurnOnly",
             "numberOfBytes": "20"
           },
-          "t_contract(IFxStateRootTunnel)7437": {
+          "t_contract(IFxStateRootTunnel)7554": {
             "label": "contract IFxStateRootTunnel",
             "numberOfBytes": "20"
           },
-          "t_contract(IPolidoAdapter)7469": {
+          "t_contract(IPolidoAdapter)7586": {
             "label": "contract IPolidoAdapter",
             "numberOfBytes": "20"
           },
-          "t_contract(IWithdrawManagerProxy)7443": {
+          "t_contract(IWithdrawManagerProxy)7560": {
             "label": "contract IWithdrawManagerProxy",
             "numberOfBytes": "20"
           },

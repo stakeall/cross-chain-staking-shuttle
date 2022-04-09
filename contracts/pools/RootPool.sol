@@ -16,6 +16,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
     address public erc20PredicateProxy;
     IPolidoAdapter public polidoAdapter;
     IERC20 public maticToken;
+    address public childPoolFundCollector;
 
     /**
      * Initialize the contract and setup roles.
@@ -27,6 +28,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
      * @param _erc20PredicateProxy - Address of the owner
      * @param _polidoAdapter - Address of the owner
      * @param _maticToken - Address of the owner
+     * @param _childPoolFundCollector - Address of childPool fund collector
      * @param _owner - Address of the owner
      */
     function initialize(
@@ -37,6 +39,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
         address _erc20PredicateProxy,
         IPolidoAdapter _polidoAdapter,
         IERC20 _maticToken,
+        address _childPoolFundCollector,
         address _owner
     ) public initializer {
         __AccessControl_init();
@@ -50,6 +53,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
         erc20PredicateProxy = _erc20PredicateProxy;
         polidoAdapter = _polidoAdapter;
         maticToken = _maticToken;
+        childPoolFundCollector = _childPoolFundCollector;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _owner);
         _setupRole(OPERATOR_ROLE, _owner);
@@ -59,25 +63,28 @@ contract RootPool is IRootPool, PoolSecurityModule {
     }
 
     /**
-     *   Withdrawing Tokens from polyogon chain to mainnet is two step process. Step 1 is startExitWithBurntTokens.
+     *   @dev Withdrawing Tokens from polyogon chain to mainnet is two step process. Step 1 is startExitWithBurntTokens.
      *   Data argument is generate from matic.js with function `matic.exitUtil.buildPayloadForExit` by passing txhash and withdraw event signature.
      *
-     * _burnTokenData Data generated from matic.js which is a proof that withdraw transaction happend on polygon chain. This data is only produced after 1 checkpoint.
+     * @param _shuttleNumber Shuttle Number on child pool for which processing is triggered on root pool.   
+     * @param _burnTokenData Data generated from matic.js which is a proof that withdraw transaction happend on polygon chain. This data is only produced after 1 checkpoint.
      */
-    function startExitWithBurntTokens(bytes memory _burnTokenData)
+    function startExitWithBurntTokens(uint256 _shuttleNumber, bytes memory _burnTokenData)
         public
         onlyRole(OPERATOR_ROLE)
         whenNotPaused
     {
         require(_burnTokenData.length > 0, "!data");
         erc20PredicateBurnOnly.startExitWithBurntTokens(_burnTokenData);
+
+        emit ShuttleProcessingInitiated(_shuttleNumber);
     }
 
     /**
-     * This method performs cross chain staking.
+     * @dev This method performs cross chain staking.
      * It recieves message sent by child tunnel, claims burned token on polygon chain, stake token to PoLido and bridge them back to child pool.
      *
-     * _messageReceiveData Data generated from matic.js which is a proof that Message is send by child tunnel to root tunnel from polygon chain. This data is only produced after 1 checkpoint.
+     * @param _messageReceiveData Data generated from matic.js which is a proof that Message is send by child tunnel to root tunnel from polygon chain. This data is only produced after 1 checkpoint.
      *
      */
     function crossChainStake(bytes memory _messageReceiveData)
@@ -127,10 +134,10 @@ contract RootPool is IRootPool, PoolSecurityModule {
     }
 
     /**
-     * This method cancels the shuttle.
+     * @dev This method cancels the shuttle.
      * It recieves message sent by child tunnel, claims burned token on polygon chain, and bridge them back to child pool.
      *
-     * _messageReceiveData Data generated from matic.js which is a proof that Message is send by child tunnel to root tunnel from polygon chain. This data is only produced after 1 checkpoint.
+     * @param _messageReceiveData Data generated from matic.js which is a proof that Message is send by child tunnel to root tunnel from polygon chain. This data is only produced after 1 checkpoint.
      *
      */
     function cancelShuttle(bytes memory _messageReceiveData)
@@ -160,7 +167,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
 
         depositManagerProxy.depositERC20ForUser(
             address(maticToken),
-            address(this),
+            childPoolFundCollector,
             amount
         );
 

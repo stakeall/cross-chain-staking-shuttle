@@ -9,6 +9,7 @@ const addresses = {
     erc20PredicateProxy: "",
     poLidoAdapter: "",
     maticToken: "",
+    childPoolFundCollector: "",
     rootPoolOwner: "",
   },
   5: {
@@ -21,13 +22,15 @@ const addresses = {
     erc20PredicateProxy: "0xdD6596F2029e6233DEFfaCa316e6A95217d4Dc34",
     poLidoAdapter: "0xf8bb8087F9967Edf6B0D26D146fA978A953EC2A5",
     maticToken: "0x499d11e0b6eac7c0593d8fb292dcbbf815fb29ae",
+    childPoolFundCollector: "0xDEb7a51A2DD4AdD4329f0aE963f4c0789A9596D3",
     rootPoolOwner: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
-    rootPoolProxy: "0x970A6E129bDC87ce7838dC0C5C066C88AdDCa35e",
+    rootPoolProxy: "0x110e5b163F833d9f5BD7bf1ce5433e2Dd4A3c3c4",
   },
   137: {
     fxChild: "0x8397259c983751DAf40400790063935a11afa28a",
     childTunnel: "",
     maticTokenOnChild: "",
+    fundCollector: "",
     stMaticToken: "",
     fee: 500,
     shuttleExpiry: 10,
@@ -39,11 +42,12 @@ const addresses = {
     childTunnel: "0x7c71db903752df85dc4ab23b5e8fdb9e416a50c7",
     maticTokenOnChild: "0x0000000000000000000000000000000000001010",
     stMaticToken: "0xa337f0B897a874DE1E9F75944629a03F911cFbE8",
+    fundCollector: "0xDEb7a51A2DD4AdD4329f0aE963f4c0789A9596D3",
     fee: 500,
     shuttleExpiry: 10,
     feeBeneficiary: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
     childPoolOwner: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
-    childPoolProxy: "0x970A6E129bDC87ce7838dC0C5C066C88AdDCa35e",
+    childPoolProxy: "0x110e5b163F833d9f5BD7bf1ce5433e2Dd4A3c3c4",
   },
 };
 

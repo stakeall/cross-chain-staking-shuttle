@@ -59,3 +59,7 @@ interface IMaticToken {
     function withdraw(uint256) external payable;
 }
 
+interface IFundCollector {
+    function withdrawFunds(uint256 _amount) external;
+}
+

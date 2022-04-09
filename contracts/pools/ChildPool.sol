@@ -15,6 +15,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
     IFxStateChildTunnel public childTunnel;
     IMaticToken public maticToken;
     IERC20 public stMaticToken;
+    IFundCollector public fundCollector; 
     uint256 public shuttleExpiry;
     uint256 public currentShuttle;
     uint256 public enroutedShuttle;
@@ -33,6 +34,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      * @param _childTunnel - Address of the child tunnel.
      * @param _maticToken - Address of MATIC token on Polygon Mainnet
      * @param _stMaticToken - Address of stMatic on Polygon Mainnet
+     * @param _fundCollector - Address of fund collector contract
      * @param _shuttleExpiry - Expiry of shuttle in blocks
      * @param _fee - Fee percentange on base 10000 that will be charged on successful arrival of shuttle.
      * @param _feeBeneficiary - Address to which fee will be transferred.
@@ -42,6 +44,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         IFxStateChildTunnel _childTunnel,
         IMaticToken _maticToken,
         IERC20 _stMaticToken,
+        IFundCollector _fundCollector, 
         uint256 _shuttleExpiry,
         uint256 _fee,
         address _feeBeneficiary,
@@ -53,6 +56,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
 
         childTunnel = _childTunnel;
         maticToken = _maticToken;
+        fundCollector = _fundCollector;
         stMaticToken = _stMaticToken;
         shuttleExpiry = _shuttleExpiry;
         fee = _fee;
@@ -196,12 +200,11 @@ contract ChildPool is IChildPool, PoolSecurityModule {
                 "!insufficient stMatic balance"
             );
 
+            shuttleFee = calculateFee(amount);
             uint256 recievedToken = amount.sub(shuttleFee);
             availableStMaticBalance = availableStMaticBalance.add(
                 recievedToken
             );
-
-            shuttleFee = calculateFee(amount);
 
             shuttles[_shuttleNumber].recievedToken = recievedToken;
             shuttles[_shuttleNumber].status = ShuttleStatus.ARRIVED;
@@ -210,6 +213,10 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         } else if (
             shuttleProcessingStatus == ShuttleProcessingStatus.CANCELLED
         ) {
+
+            // Collect funds send by rootPool after shuttle cancellation
+            fundCollector.withdrawFunds(amount);
+
             // make sure Matic base token is arrived from bridge in case on cancellation
             require(
                 address(this).balance >=

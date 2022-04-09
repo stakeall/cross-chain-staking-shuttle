@@ -3,6 +3,9 @@ pragma solidity ^0.8.3;
 contract IRootPool {
 
 
+    event ShuttleProcessingInitiated(
+        uint256 _shuttleNumber
+    );
     event ShuttleProcessed(
         uint256 _shuttleNumber,
         uint256 _stakeAmount,
