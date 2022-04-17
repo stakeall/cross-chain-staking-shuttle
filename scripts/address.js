@@ -24,7 +24,7 @@ const addresses = {
     maticToken: "0x499d11e0b6eac7c0593d8fb292dcbbf815fb29ae",
     childPoolFundCollector: "0xDEb7a51A2DD4AdD4329f0aE963f4c0789A9596D3",
     rootPoolOwner: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
-    rootPoolProxy: "0x110e5b163F833d9f5BD7bf1ce5433e2Dd4A3c3c4",
+    rootPoolProxy: "0xd4F9C27952a1bf40A0E3Fc1AaF0D4eBBCE8c57bb",
   },
   137: {
     fxChild: "0x8397259c983751DAf40400790063935a11afa28a",
@@ -47,7 +47,7 @@ const addresses = {
     shuttleExpiry: 10,
     feeBeneficiary: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
     childPoolOwner: "0x0C170Dc2D2537FaDFdB2b374c3141bBb4ADDb1f7",
-    childPoolProxy: "0x110e5b163F833d9f5BD7bf1ce5433e2Dd4A3c3c4",
+    childPoolProxy: "0xd4F9C27952a1bf40A0E3Fc1AaF0D4eBBCE8c57bb",
   },
 };
 
