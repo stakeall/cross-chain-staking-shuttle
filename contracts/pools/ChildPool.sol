@@ -1,4 +1,4 @@
-pragma solidity ^0.8.3;
+pragma solidity 0.8.7;
 
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -29,7 +29,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
     mapping(uint256 => mapping(address => uint256)) public balances;
 
     /**
-     * Initialize the contract, setup roles and create first shuttle
+     * @dev Initialize the contract, setup roles and create first shuttle
      *
      * @param _childTunnel - Address of the child tunnel.
      * @param _maticToken - Address of MATIC token on Polygon Mainnet
@@ -337,7 +337,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
     }
 
     /**
-     * Operator can cancel shuttle which is in available status, users will be able to claim deposited matic tokens once shuttle is cancelled.
+     * @dev Operator can cancel shuttle which is in available status, users will be able to claim deposited matic tokens once shuttle is cancelled.
      *
      * @param _shuttleNumber Id of shuttle.
      */
@@ -366,6 +366,8 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      * @param _fee Fee percentage with 10000 as hundred percentage.
      */
     function setFee(uint256 _fee) external onlyRole(GOVERNANCE_ROLE) {
+
+        require(_fee <= FEE_DENOMINATOR, "!fee");
         fee = _fee;
         emit FeeChanged(fee);
     }
@@ -380,6 +382,8 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         external
         onlyRole(GOVERNANCE_ROLE)
     {
+        require(_shuttleExpiry > 0, "Invalid shuttle expiry");
+
         shuttleExpiry = _shuttleExpiry;
         emit ShuttleExpiryChanged(shuttleExpiry);
     }

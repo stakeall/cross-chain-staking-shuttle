@@ -1,7 +1,8 @@
-pragma solidity ^0.8.3;
+pragma solidity 0.8.7;
 
 contract IChildPool {
     enum ShuttleStatus {
+        UNAVAILABLE,
         AVAILABLE,
         ENROUTE,
         ARRIVED,

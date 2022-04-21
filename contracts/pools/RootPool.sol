@@ -1,4 +1,4 @@
-pragma solidity ^0.8.3;
+pragma solidity 0.8.7;
 
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -25,9 +25,9 @@ contract RootPool is IRootPool, PoolSecurityModule {
      * @param _withdrawManagerProxy - Address of MATIC token on Polygon Mainnet
      * @param _erc20PredicateBurnOnly - Address of stMatic on Polygon Mainnet
      * @param _depositManagerProxy Deposit Manager proxy address 
-     * @param _erc20PredicateProxy - Address of the owner
-     * @param _polidoAdapter - Address of the owner
-     * @param _maticToken - Address of the owner
+     * @param _erc20PredicateProxy - Address of the erc20 Predicate Proxy
+     * @param _polidoAdapter - Address of the Polido Adapter
+     * @param _maticToken - Address of the matic token 
      * @param _childPoolFundCollector - Address of childPool fund collector
      * @param _owner - Address of the owner
      */
