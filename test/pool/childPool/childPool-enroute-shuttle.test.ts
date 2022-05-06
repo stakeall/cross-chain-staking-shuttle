@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { deployChildPool,  getShuttleInEnrouteState } from "../utils";
+import { deployChildPool,  getShuttleInEnrouteState, ShuttleStatus } from "../utils";
 
 describe("ChildPool.enrouteShuttle", function () {
 
@@ -20,14 +20,14 @@ describe("ChildPool.enrouteShuttle", function () {
 
         // deposit user 1
         let amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
         amount = ethers.utils.parseEther("2");
 
         // deposit user 2
-        await childPool.connect(user2).deposit(amount, {
+        await childPool.connect(user2).deposit({
             value: amount
         });
 
@@ -37,8 +37,8 @@ describe("ChildPool.enrouteShuttle", function () {
         const currentShuttleObject = await childPool.shuttles(1);
 
         // assert shuttle
-        expect(prevShuttleObject.status).to.equals(0);
-        expect(currentShuttleObject.status).to.equals(1);
+        expect(prevShuttleObject.status).to.equals(ShuttleStatus.AVAILABLE);
+        expect(currentShuttleObject.status).to.equals(ShuttleStatus.ENROUTE);
         expect(await childPool.availableMaticBalance()).to.equals(0);
 
         expect(await mockMaticToken.withdrawAmount()).to.equals(totalAmount);
@@ -75,7 +75,7 @@ describe("ChildPool.enrouteShuttle", function () {
 
         // deposit user 1
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -99,7 +99,7 @@ describe("ChildPool.enrouteShuttle", function () {
 
           // deposit user 1
           const amount = ethers.utils.parseEther("1");
-          await childPool.connect(user1).deposit(amount, {
+          await childPool.connect(user1).deposit({
               value: amount
           });
 
@@ -115,7 +115,7 @@ describe("ChildPool.enrouteShuttle", function () {
         const { childPool } = await getShuttleInEnrouteState(deployer, 2000, owner, user1, user2);
 
         const amount = ethers.utils.parseEther("1");
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         }))
             .to.emit(childPool, 'Deposit').withArgs(2, user1.address, amount);

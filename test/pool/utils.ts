@@ -54,14 +54,14 @@ export const getShuttleInEnrouteState = async (
     const { childPool, mockMaticToken, mockFxStateChildTunnel, stMaticToken, fundCollector } = await deployChildPool(deployer, shuttleExpiry, owner.address, deployer.address);
 
     let amount = ethers.utils.parseEther("1");
-    await childPool.connect(user1).deposit(amount, {
+    await childPool.connect(user1).deposit({
         value: amount
     });
 
     amount = ethers.utils.parseEther("2");
 
     // deposit user 2
-    await childPool.connect(user2).deposit(amount, {
+    await childPool.connect(user2).deposit({
         value: amount
     })
 
@@ -152,9 +152,10 @@ export enum ShuttleProcessingStatus {
 }
 
 export enum ShuttleStatus {
-    AVAILABLE = 0,
-    ENROUTE = 1,
-    ARRIVED = 2,
-    EXPIRED = 3,
-    CANCELLED = 4
+    UNAVAILABLE = 0,
+    AVAILABLE = 1,
+    ENROUTE = 2,
+    ARRIVED = 3,
+    EXPIRED = 4,
+    CANCELLED = 5
 }

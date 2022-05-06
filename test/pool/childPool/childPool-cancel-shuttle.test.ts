@@ -19,7 +19,7 @@ describe("ChildPool.cancelShuttle", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -40,7 +40,7 @@ describe("ChildPool.cancelShuttle", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -61,7 +61,7 @@ describe("ChildPool.cancelShuttle", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -69,7 +69,7 @@ describe("ChildPool.cancelShuttle", function () {
 
         await expect(childPool.connect(owner).cancelShuttle(1)).to.emit(childPool, 'ShuttleCancelled').withArgs(1);
 
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         })).to.emit(childPool, 'Deposit').withArgs(2, user1.address, amount);;
     })

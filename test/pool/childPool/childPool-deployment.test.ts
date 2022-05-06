@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { ShuttleStatus } from "../utils";
 
 describe("ChildPool.init", function () {
 
@@ -47,7 +48,7 @@ describe("ChildPool.init", function () {
         const currentShuttleObject = await childPool.shuttles(1);
 
         // assert shuttle
-        expect(currentShuttleObject.status).to.equals(0);
+        expect(currentShuttleObject.status).to.equals(ShuttleStatus.AVAILABLE);
         expect(currentShuttleObject.totalAmount).to.equals(0);
         expect(currentShuttleObject.recievedToken).to.equals(0);
         expect(currentShuttleObject.expiry).to.equals(deploymentBlock + shuttleExpiry);

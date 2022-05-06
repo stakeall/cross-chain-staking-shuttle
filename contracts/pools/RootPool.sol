@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.7;
 
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -13,10 +14,39 @@ contract RootPool is IRootPool, PoolSecurityModule {
     IWithdrawManagerProxy public withdrawManagerProxy;
     IERC20PredicateBurnOnly public erc20PredicateBurnOnly;
     IDepositManagerProxy public depositManagerProxy;
-    address public erc20PredicateProxy;
     IPolidoAdapter public polidoAdapter;
     IERC20 public maticToken;
     address public childPoolFundCollector;
+
+
+    /**
+     * @dev Internal method to recieve shuttle which is initiated from child pool.
+     *
+     * @param _messageReceiveData Data generated from matic.js which is a proof that Message is send by child tunnel to root tunnel from polygon chain. This data is only produced after 1 checkpoint.
+     *
+     */
+    function _receieveShuttleFromChild(bytes memory _messageReceiveData) 
+        internal
+        returns(uint256 shuttleNumber_, uint256 amount_)
+    {
+        require(_messageReceiveData.length > 0, "!messageReceiveData");
+
+        // recieve message send by child tunnel
+        rootTunnel.receiveMessage(_messageReceiveData);
+
+        // decode received message
+        (shuttleNumber_, amount_) = rootTunnel.readData();
+
+        uint256 beforeBalance = maticToken.balanceOf(address(this));
+
+        // Step 2 for claiming tokens send from polygon to ethereum
+        withdrawManagerProxy.processExits(address(maticToken));
+
+        uint256 afterBalance = maticToken.balanceOf(address(this));
+        uint256 effectiveBalance = afterBalance.sub(beforeBalance);
+
+        require(effectiveBalance >= amount_, "Insufficient amount to stake");
+    }
 
     /**
      * Initialize the contract and setup roles.
@@ -25,7 +55,6 @@ contract RootPool is IRootPool, PoolSecurityModule {
      * @param _withdrawManagerProxy - Address of MATIC token on Polygon Mainnet
      * @param _erc20PredicateBurnOnly - Address of stMatic on Polygon Mainnet
      * @param _depositManagerProxy Deposit Manager proxy address 
-     * @param _erc20PredicateProxy - Address of the erc20 Predicate Proxy
      * @param _polidoAdapter - Address of the Polido Adapter
      * @param _maticToken - Address of the matic token 
      * @param _childPoolFundCollector - Address of childPool fund collector
@@ -36,7 +65,6 @@ contract RootPool is IRootPool, PoolSecurityModule {
         IWithdrawManagerProxy _withdrawManagerProxy,
         IERC20PredicateBurnOnly _erc20PredicateBurnOnly,
         IDepositManagerProxy _depositManagerProxy,
-        address _erc20PredicateProxy,
         IPolidoAdapter _polidoAdapter,
         IERC20 _maticToken,
         address _childPoolFundCollector,
@@ -50,7 +78,6 @@ contract RootPool is IRootPool, PoolSecurityModule {
         withdrawManagerProxy = _withdrawManagerProxy;
         erc20PredicateBurnOnly = _erc20PredicateBurnOnly;
         depositManagerProxy = _depositManagerProxy;
-        erc20PredicateProxy = _erc20PredicateProxy;
         polidoAdapter = _polidoAdapter;
         maticToken = _maticToken;
         childPoolFundCollector = _childPoolFundCollector;
@@ -92,23 +119,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
         onlyRole(OPERATOR_ROLE)
         whenNotPaused
     {
-        require(_messageReceiveData.length > 0, "!messageReceiveData");
-
-        // recieve message send by child tunnel
-        rootTunnel.receiveMessage(_messageReceiveData);
-
-        // decode received message
-        (uint256 shuttleNumber, uint256 amount) = rootTunnel.readData();
-
-        uint256 beforeBalance = maticToken.balanceOf(address(this));
-
-        // Step 2 for claiming tokens send from polygon to ethereum
-        withdrawManagerProxy.processExits(address(maticToken));
-
-        uint256 afterBalance = maticToken.balanceOf(address(this));
-        uint256 effectiveBalance = afterBalance.sub(beforeBalance);
-
-        require(effectiveBalance >= amount, "Insufficient amount to stake");
+        (uint256 amount, uint256 shuttleNumber) = _receieveShuttleFromChild(_messageReceiveData);
 
         maticToken.approve(address(polidoAdapter), amount);
 
@@ -145,23 +156,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
         onlyRole(OPERATOR_ROLE)
         whenNotPaused
     {
-        require(_messageReceiveData.length > 0, "!messageReceiveData");
-
-        // recieve message send by child tunnel
-        rootTunnel.receiveMessage(_messageReceiveData);
-
-        // decode received message
-        (uint256 shuttleNumber, uint256 amount) = rootTunnel.readData();
-
-        uint256 beforeBalance = maticToken.balanceOf(address(this));
-
-        // Step 2 for claiming tokens send from polygon to ethereum
-        withdrawManagerProxy.processExits(address(maticToken));
-
-        uint256 afterBalance = maticToken.balanceOf(address(this));
-        uint256 effectiveBalance = afterBalance.sub(beforeBalance);
-
-        require(effectiveBalance >= amount, "Insufficient amount recieved");
+       (uint256 amount, uint256 shuttleNumber) = _receieveShuttleFromChild(_messageReceiveData);
 
         maticToken.approve(address(depositManagerProxy), amount);
 
@@ -182,5 +177,21 @@ contract RootPool is IRootPool, PoolSecurityModule {
             ShuttleProcessingStatus.CANCELLED
         );
 
+    }
+
+    /** Setter */
+
+    /**
+     * @dev This will set address of childPool fund collector contract 
+     *
+     * @param _childPoolFeeCollector Address of child Pool fund collector contract. 
+     */
+    function setChildPoolFeeCollector(address _childPoolFeeCollector)
+        external
+        onlyRole(GOVERNANCE_ROLE)
+    {
+        require(_childPoolFeeCollector != address(0), "!childPoolFeeCollector");
+        
+        childPoolFundCollector = _childPoolFeeCollector;
     }
 }

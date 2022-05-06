@@ -9,7 +9,7 @@ describe("RootPool.init", function () {
             "RootPool"
         );
 
-        const [deployer, owner, rootTunnel, withdrawManagerProxy, erc20PredicateBurnOnly, depositManagerProxy, erc20PredicateProxy, polidoAdapter, maticToken, childPoolFundCollector] = await ethers.getSigners();
+        const [deployer, owner, rootTunnel, withdrawManagerProxy, erc20PredicateBurnOnly, depositManagerProxy, polidoAdapter, maticToken, childPoolFundCollector] = await ethers.getSigners();
 
         const rootPool = await RootPool.connect(deployer).deploy();
         await rootPool.deployed();
@@ -19,7 +19,6 @@ describe("RootPool.init", function () {
             withdrawManagerProxy.address,
             erc20PredicateBurnOnly.address,
             depositManagerProxy.address,
-            erc20PredicateProxy.address,
             polidoAdapter.address,
             maticToken.address,
             childPoolFundCollector.address,
@@ -34,7 +33,6 @@ describe("RootPool.init", function () {
         expect(await rootPool.withdrawManagerProxy()).to.equal(withdrawManagerProxy.address);
         expect(await rootPool.erc20PredicateBurnOnly()).to.equal(erc20PredicateBurnOnly.address);
         expect(await rootPool.depositManagerProxy()).to.equal(depositManagerProxy.address);
-        expect(await rootPool.erc20PredicateProxy()).to.equal(erc20PredicateProxy.address);
         expect(await rootPool.polidoAdapter()).to.equal(polidoAdapter.address);
         expect(await rootPool.maticToken()).to.equal(maticToken.address);
         expect(await rootPool.childPoolFundCollector()).to.equal(childPoolFundCollector.address);

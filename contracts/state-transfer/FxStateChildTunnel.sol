@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -33,7 +33,7 @@ contract FxStateChildTunnel is FxBaseChildTunnel, Ownable {
         _sendMessageToRoot(message);
     }
 
-    function readData() public view returns (uint256, uint256, ShuttleProcessingStatus) {
+    function readData() external view returns (uint256, uint256, ShuttleProcessingStatus) {
       (uint256 shuttleNumber, uint256 amount, ShuttleProcessingStatus shuttleProcessingStatus) = abi.decode(
             latestData,
             (uint256, uint256, ShuttleProcessingStatus)
