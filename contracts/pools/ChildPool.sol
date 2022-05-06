@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.7;
 
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -62,21 +63,16 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         fee = _fee;
         feeBeneficiary = _feeBeneficiary;
 
-        currentShuttle = 0;
-        enroutedShuttle = 0;
-        availableMaticBalance = 0;
-        availableStMaticBalance = 0;
-
         _setupRole(DEFAULT_ADMIN_ROLE, _owner);
         _setupRole(OPERATOR_ROLE, _owner);
         _setupRole(CANCEL_ROLE, _owner);
         _setupRole(PAUSE_ROLE, _owner);
         _setupRole(GOVERNANCE_ROLE, _owner);
 
-        createNewShuttle();
+        _createNewShuttle();
     }
 
-    function createNewShuttle() internal {
+    function _createNewShuttle() internal {
         currentShuttle = currentShuttle.add(1);
         shuttles[currentShuttle] = Shuttle({
             totalAmount: 0,
@@ -90,27 +86,23 @@ contract ChildPool is IChildPool, PoolSecurityModule {
     /**
      * @dev Deposit Matic tokens to current shuttle
      *
-     * @param _amount - Amount of matic to deposited in the current shuttle.
      */
-    function deposit(uint256 _amount) external payable whenNotPaused {
-        require(_amount > 0, "!amount");
-        require(msg.value == _amount, "!mismatch amount");
-        require(
-            shuttles[currentShuttle].status == ShuttleStatus.AVAILABLE,
-            "!Shuttle"
-        );
+    function deposit() external payable whenNotPaused {
+        require(msg.value > 0, "!amount");
+
+        uint256 amount = msg.value;
 
         balances[currentShuttle][msg.sender] = balances[currentShuttle][
             msg.sender
-        ].add(_amount);
+        ].add(amount);
 
         shuttles[currentShuttle].totalAmount = shuttles[currentShuttle]
             .totalAmount
-            .add(_amount);
+            .add(amount);
 
-        availableMaticBalance = availableMaticBalance.add(_amount);
+        availableMaticBalance = availableMaticBalance.add(amount);
 
-        emit Deposit(currentShuttle, msg.sender, _amount);
+        emit Deposit(currentShuttle, msg.sender, amount);
     }
 
     /**
@@ -142,7 +134,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         maticToken.withdraw{value: amount}(amount);
         childTunnel.sendMessageToRoot(abi.encode(enroutedShuttle, amount));
 
-        createNewShuttle();
+        _createNewShuttle();
 
         emit ShuttleEnrouted(enroutedShuttle, amount);
     }
@@ -332,7 +324,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
 
         shuttles[_shuttleNumber].status = ShuttleStatus.EXPIRED;
 
-        createNewShuttle();
+        _createNewShuttle();
         emit ShuttleExpired(_shuttleNumber);
     }
 
@@ -353,7 +345,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         require(shuttle.status == ShuttleStatus.AVAILABLE, "!invalid status");
 
         shuttles[_shuttleNumber].status = ShuttleStatus.CANCELLED;
-        createNewShuttle();
+        _createNewShuttle();
         emit ShuttleCancelled(_shuttleNumber);
     }
 
@@ -388,7 +380,34 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         emit ShuttleExpiryChanged(shuttleExpiry);
     }
 
-    //todo decide on receive vs fallback
+    /**
+     * @dev This will set address of fund collector contract 
+     *
+     * @param _fundCollector Address of fund collector contract. 
+     */
+    function setChildPoolFeeCollector(address _fundCollector)
+        external
+        onlyRole(GOVERNANCE_ROLE)
+    {
+        require(_fundCollector != address(0), "!fundCollector");
+        
+        fundCollector = IFundCollector(_fundCollector);
+    }
+
+    /**
+     * @dev This will set address of fee beneficiary
+     *
+     * @param _feeBeneficiary Address of fee beneficiary. 
+     */
+    function setFeeBeneficiary(address _feeBeneficiary)
+        external
+        onlyRole(GOVERNANCE_ROLE)
+    {
+        require(_feeBeneficiary != address(0), "!feeBeneficiary");
+        
+        feeBeneficiary = _feeBeneficiary;
+    }
+
     receive() external payable {}
 
     fallback() external payable {}

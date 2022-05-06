@@ -222,7 +222,7 @@ describe("ChildPool.arriveShuttle", function () {
         const { childPool } = await getShuttleInEnrouteState(deployer, 2000, owner, user1, user2);
 
         const amount = ethers.utils.parseEther("1");
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         }))
             .to.emit(childPool, 'Deposit').withArgs(2, user1.address, amount);
@@ -247,7 +247,7 @@ describe("ChildPool.arriveShuttle", function () {
 
         // deposit to shuttle 2 
         const amount = ethers.utils.parseEther("1");
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         }))
             .to.emit(childPool, 'Deposit').withArgs(2, user1.address, amount);

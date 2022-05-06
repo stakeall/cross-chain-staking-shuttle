@@ -146,7 +146,7 @@ describe("ChildPool.claim", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -171,7 +171,7 @@ describe("ChildPool.claim", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 

@@ -19,7 +19,7 @@ describe("ChildPool.expireShuttle", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -42,7 +42,7 @@ describe("ChildPool.expireShuttle", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -65,7 +65,7 @@ describe("ChildPool.expireShuttle", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -106,7 +106,7 @@ describe("ChildPool.expireShuttle", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await childPool.connect(user1).deposit(amount, {
+        await childPool.connect(user1).deposit({
             value: amount
         });
 
@@ -115,7 +115,7 @@ describe("ChildPool.expireShuttle", function () {
         await expect(childPool.connect(user1).expireShuttle(1)).to.emit(childPool, 'ShuttleExpired').withArgs(1);
 
 
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         })).to.emit(childPool, 'Deposit').withArgs(2, user1.address, amount);;
     })

@@ -1,7 +1,6 @@
 import { expect } from "chai";
-import exp from "constants";
 import { ethers } from "hardhat";
-import { deployChildPool } from "../utils";
+import { deployChildPool, ShuttleStatus } from "../utils";
 
 describe("ChildPool.deposit", function () {
 
@@ -17,7 +16,7 @@ describe("ChildPool.deposit", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         }))
             .to.emit(childPool, 'Deposit').withArgs(1, user1.address, amount);
@@ -26,7 +25,7 @@ describe("ChildPool.deposit", function () {
         const currentShuttleObject = await childPool.shuttles(1);
 
         // assert shuttle
-        expect(currentShuttleObject.status).to.equals(0);
+        expect(currentShuttleObject.status).to.equals(ShuttleStatus.AVAILABLE);
         expect(currentShuttleObject.totalAmount).to.equals(amount);
         expect(currentShuttleObject.recievedToken).to.equals(0);
 
@@ -50,7 +49,7 @@ describe("ChildPool.deposit", function () {
         );
 
         const amount = ethers.utils.parseEther("0");
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         }))
             .to.be.revertedWith('!amount');
@@ -69,10 +68,10 @@ describe("ChildPool.deposit", function () {
         );
 
         const amount = ethers.utils.parseEther("1");
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: '0'
         }))
-            .to.be.revertedWith('!mismatch amount');
+            .to.be.revertedWith('!amount');
 
     });
 
@@ -89,7 +88,7 @@ describe("ChildPool.deposit", function () {
 
         // Test for user1
         let amount = ethers.utils.parseEther("1");
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         }))
             .to.emit(childPool, 'Deposit').withArgs(1, user1.address, amount);
@@ -101,7 +100,7 @@ describe("ChildPool.deposit", function () {
         let currentShuttleObject = await childPool.shuttles(1);
 
         // assert shuttle
-        expect(currentShuttleObject.status).to.equals(0);
+        expect(currentShuttleObject.status).to.equals(ShuttleStatus.AVAILABLE);
         expect(currentShuttleObject.totalAmount).to.equals(amount);
         expect(currentShuttleObject.recievedToken).to.equals(0);
 
@@ -109,7 +108,7 @@ describe("ChildPool.deposit", function () {
 
 
         amount = ethers.utils.parseEther("2");
-        await expect(childPool.connect(user1).deposit(amount, {
+        await expect(childPool.connect(user1).deposit({
             value: amount
         }))
             .to.emit(childPool, 'Deposit').withArgs(1, user1.address, amount);
@@ -120,7 +119,7 @@ describe("ChildPool.deposit", function () {
         currentShuttleObject = await childPool.shuttles(1);
 
         // assert shuttle
-        expect(currentShuttleObject.status).to.equals(0);
+        expect(currentShuttleObject.status).to.equals(ShuttleStatus.AVAILABLE);
         expect(currentShuttleObject.totalAmount).to.equals(ethers.utils.parseEther("3"));
         expect(currentShuttleObject.recievedToken).to.equals(0);
 
@@ -129,7 +128,7 @@ describe("ChildPool.deposit", function () {
 
         // Test for user2 
         amount = ethers.utils.parseEther("5");
-        await expect(childPool.connect(user2).deposit(amount, {
+        await expect(childPool.connect(user2).deposit({
             value: amount
         }))
             .to.emit(childPool, 'Deposit').withArgs(1, user2.address, amount);
@@ -140,7 +139,7 @@ describe("ChildPool.deposit", function () {
         currentShuttleObject = await childPool.shuttles(1);
 
         // assert shuttle
-        expect(currentShuttleObject.status).to.equals(0);
+        expect(currentShuttleObject.status).to.equals(ShuttleStatus.AVAILABLE);
         expect(currentShuttleObject.totalAmount).to.equals(ethers.utils.parseEther("8"));
         expect(currentShuttleObject.recievedToken).to.equals(0);
 
