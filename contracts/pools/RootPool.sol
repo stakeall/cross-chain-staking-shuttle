@@ -51,9 +51,9 @@ contract RootPool is IRootPool, PoolSecurityModule {
     /**
      * Initialize the contract and setup roles.
      *
-     * @param _rootTunnel - Address of the child tunnel.
-     * @param _withdrawManagerProxy - Address of MATIC token on Polygon Mainnet
-     * @param _erc20PredicateBurnOnly - Address of stMatic on Polygon Mainnet
+     * @param _rootTunnel - Address of the Root tunnel.
+     * @param _withdrawManagerProxy - Address of Withdraw Manager Proxy.
+     * @param _erc20PredicateBurnOnly - Address of erc20 Predicate Burn Only. 
      * @param _depositManagerProxy Deposit Manager proxy address 
      * @param _polidoAdapter - Address of the Polido Adapter
      * @param _maticToken - Address of the matic token 
