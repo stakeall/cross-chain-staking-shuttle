@@ -119,7 +119,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
         onlyRole(OPERATOR_ROLE)
         whenNotPaused
     {
-        (uint256 amount, uint256 shuttleNumber) = _receieveShuttleFromChild(_messageReceiveData);
+        (uint256 shuttleNumber, uint256 amount) = _receieveShuttleFromChild(_messageReceiveData);
 
         maticToken.approve(address(polidoAdapter), amount);
 
@@ -156,7 +156,7 @@ contract RootPool is IRootPool, PoolSecurityModule {
         onlyRole(OPERATOR_ROLE)
         whenNotPaused
     {
-       (uint256 amount, uint256 shuttleNumber) = _receieveShuttleFromChild(_messageReceiveData);
+       (uint256 shuttleNumber, uint256 amount) = _receieveShuttleFromChild(_messageReceiveData);
 
         maticToken.approve(address(depositManagerProxy), amount);
 
