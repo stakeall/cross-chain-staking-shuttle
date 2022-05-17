@@ -23,7 +23,6 @@ async function main() {
   const withdrawManagerProxy = addresses[chainId].withdrawManagerProxy;
   const erc20PredicateBurnOnly = addresses[chainId].erc20PredicateBurnOnly;
   const depositManagerProxy = addresses[chainId].depositManagerProxy;
-  const erc20PredicateProxy = addresses[chainId].erc20PredicateProxy;
   const poLidoAdapter = addresses[chainId].poLidoAdapter;
   const maticToken = addresses[chainId].maticToken;
   const childPoolFundCollector = addresses[chainId].childPoolFundCollector;
@@ -38,7 +37,6 @@ async function main() {
       withdrawManagerProxy,
       erc20PredicateBurnOnly,
       depositManagerProxy,
-      erc20PredicateProxy,
       poLidoAdapter,
       maticToken,
       childPoolFundCollector,
