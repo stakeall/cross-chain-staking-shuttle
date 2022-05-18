@@ -37,15 +37,14 @@ contract RootPool is IRootPool, PoolSecurityModule {
         // decode received message
         (shuttleNumber_, amount_) = rootTunnel.readData();
 
-        uint256 beforeBalance = maticToken.balanceOf(address(this));
-
-        // Step 2 for claiming tokens send from polygon to ethereum
+        // Step 2 for claiming tokens send from polygon to ethereum. Sometime, tokens are automatically transferred to beneficiary by 
+        // bridge. Polygon bridge contracts maintains a queue. If a users claims tokens from brige, it will automatically transfer tokens for all the 
+        // users who are ahead of this user.. 
         withdrawManagerProxy.processExits(address(maticToken));
 
-        uint256 afterBalance = maticToken.balanceOf(address(this));
-        uint256 effectiveBalance = afterBalance.sub(beforeBalance);
+        uint256 balance = maticToken.balanceOf(address(this));
 
-        require(effectiveBalance >= amount_, "Insufficient amount to stake");
+        require(balance >= amount_, "Insufficient amount to stake");
     }
 
     /**
