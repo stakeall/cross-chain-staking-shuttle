@@ -5,8 +5,8 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",
-    "deploy-tunnel-mainnet": "npx hardhat run scripts/deploy_state_transfer_tunnels.js --network mainnet",
-    "deploy-tunnel-polygon": "npx hardhat run scripts/deploy_state_transfer_tunnels.js --network polygon",
+    "deploy-tunnel-mainnet": "npx hardhat run scripts/deploy_state_transfer_tunnels.js --network truffle-dashboard",
+    "deploy-tunnel-polygon": "npx hardhat run scripts/deploy_state_transfer_tunnels.js --network truffle-dashboard",
     "deploy-tunnel-goerli": "npx hardhat run scripts/deploy_state_transfer_tunnels.js --network goerli",
     "deploy-tunnel-mumbai": "npx hardhat run scripts/deploy_state_transfer_tunnels.js --network mumbai",
     "deploy_polido_adapter_goerli": "npx hardhat run scripts/deploy_polido_adapter.js --network goerli",
@@ -14,12 +14,14 @@
     "deploy_polido_adapter_localhost": "npx hardhat run scripts/deploy_polido_adapter.js --network localhost",
     "upgrade_polido_adapter_goerli": "npx hardhat run scripts/upgrade_polido_adapter.js --network goerli",
     "upgrade_polido_adapter_mainnet": "npx hardhat run scripts/upgrade_polido_adapter.js --network mainnet",
+    "deploy-pool-mainnet": "npx hardhat run scripts/deploy_staking_pools.js --network truffle-dashboard",
+    "deploy-pool-polygon": "npx hardhat run scripts/deploy_staking_pools.js --network truffle-dashboard",
     "deploy-pool-goerli": "npx hardhat run scripts/deploy_staking_pools.js --network goerli",
     "deploy-pool-mumbai": "npx hardhat run scripts/deploy_staking_pools.js --network mumbai",
     "upgrade-pool-goerli": "npx hardhat run scripts/upgrade_pools.js --network goerli",
     "upgrade-pool-mumbai": "npx hardhat run scripts/upgrade_pools.js --network mumbai",
-    "deploy-fund-collector": "npx hardhat run scripts/deploy_fund_collector.js --network mumbai"
-  
+    "deploy-fund-collector": "npx hardhat run scripts/deploy_fund_collector.js --network mumbai",
+    "deploy-fund-collector-polygon": "npx hardhat run scripts/deploy_fund_collector.js --network truffle-dashboard"
   },
   "devDependencies": {
     "@ethersproject/bignumber": "5.6.0",
