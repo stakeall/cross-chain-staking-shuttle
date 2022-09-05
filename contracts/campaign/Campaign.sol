@@ -93,12 +93,18 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         );
     }
 
+    function claimRewards(
         uint256 _shuttleNumber,
         uint256 _campaignNumber,
         uint256 _userAmount,
         uint256 _totalAmount,
         address payable _sender
     ) external onlyChildPool {
+        require(
+            campaigns[_campaignNumber].campaignStatus == CampaignStatus.ACTIVE,
+            "!Active Campaign"
+        );
+
         require(
             _shuttleNumber >= campaigns[_campaignNumber].startShuttleNum && 
             _shuttleNumber <= campaigns[_campaignNumber].endShuttleNum, 
