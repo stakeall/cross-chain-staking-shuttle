@@ -45,17 +45,17 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         uint256 _totalRewardAmount,
         IERC20 _rewardToken
     ) external onlyRole(GOVERNANCE_ROLE) {
-        uint256 totalShuttles_ = _endShuttle.sub(_startShuttle).add(1);
+        uint256 totalShuttles_ = _endShuttleNum.sub(_startShuttleNum).add(1);
         uint256 rewardAmountPerShuttle_ = _totalRewardAmount.div(totalShuttles_);
 
         currentCampaign = currentCampaign.add(1);
-        campaigns[currentCampaign] = ShuttleCampaign({
+        campaigns[currentCampaign] = ACampaign({
             startShuttleNum: _startShuttleNum,
             endShuttleNum: _endShuttleNum,
             totalRewardAmount: _totalRewardAmount,
             totalClaimedAmount: 0,
             rewardAmountPerShuttle: rewardAmountPerShuttle_,
-            campaignStatus: CampaignStatus.ACTIVE
+            campaignStatus: CampaignStatus.ACTIVE,
             rewardToken: _rewardToken
         });
         
@@ -113,7 +113,7 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         
         uint256 rewardAmount_ = campaigns[_campaignNumber].rewardAmountPerShuttle.mul(_userAmount).div(_totalAmount);
 
-        campaigns[_campaignNumber].rewardToken.transfer(rewardAmount_, _sender);
+        campaigns[_campaignNumber].rewardToken.transfer(_sender, rewardAmount_);
 
         emit RewardClaimed(_shuttleNumber, _campaignNumber, rewardAmount_, _sender);        
     }
