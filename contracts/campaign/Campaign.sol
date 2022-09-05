@@ -67,6 +67,12 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         uint256 _userShare,
         address payable _sender
     ) external onlyChildPool {
+        require(
+            _shuttleNumber >= campaigns[_campaignNumber].startShuttleNum && 
+            _shuttleNumber <= campaigns[_campaignNumber].endShuttleNum, 
+            "!No Shuttle in Campaign"
+        );
+        
         uint256 rewardAmount_ = campaigns[_campaignNumber].rewardAmountPerShuttle.mul(_userShare);
 
         campaigns[_campaignNumber].rewardToken.transfer(rewardAmount_, _sender);
