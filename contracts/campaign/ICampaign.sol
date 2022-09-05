@@ -4,6 +4,13 @@ pragma solidity 0.8.7;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract ICampaign {
+
+    enum CampaignStatus {
+        ACTIVE,
+        PAUSED,
+        DELETED
+    }
+
     event RewardClaimed(
         uint256 shuttleNumber,
         uint256 campaignNumber,
@@ -25,6 +32,7 @@ contract ICampaign {
         uint256 totalRewardAmount;
         uint256 totalClaimedAmount;
         uint256 rewardAmountPerShuttle;
+        CampaignStatus campaignStatus;
         IERC20 rewardToken;
     }
 }

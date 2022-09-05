@@ -55,6 +55,7 @@ contract Campaign is ICampaign, CampaignSecurityModule {
             totalRewardAmount: _totalRewardAmount,
             totalClaimedAmount: 0,
             rewardAmountPerShuttle: rewardAmountPerShuttle_,
+            campaignStatus: CampaignStatus.ACTIVE
             rewardToken: _rewardToken
         });
         
