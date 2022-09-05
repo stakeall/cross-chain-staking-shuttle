@@ -12,17 +12,25 @@ contract Campaign is ICampaign, CampaignSecurityModule {
 
     uint256 public currentCampaign;
     address public owner;
+    address public childPool;
 
     mapping(uint256 => ACampaign) public campaigns;
 
+    modifier onlyChildPool(){
+        require(msg.sender == childPool, "!ChildPool");
+        _;
+    }
+
     function initialize(
-        address _owner
+        address _owner,
+        address _childPool
     ) public initializer {
         __AccessControl_init();
         __Pausable_init();
         __ReentrancyGuard_init();
 
         owner = _owner;
+        childPool = _childPool;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _owner);
         _setupRole(GOVERNANCE_ROLE, _owner);
@@ -58,7 +66,7 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         uint256 _campaignNumber
         uint256 _userShare,
         address payable _sender
-    ) external {
+    ) external onlyChildPool {
         uint256 rewardAmount_ = campaigns[_campaignNumber].rewardAmountPerShuttle.mul(_userShare);
 
         campaigns[_campaignNumber].rewardToken.transfer(rewardAmount_, _sender);
