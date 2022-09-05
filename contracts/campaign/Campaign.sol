@@ -63,8 +63,9 @@ contract Campaign is ICampaign, CampaignSecurityModule {
 
     function claim(
         uint256 _shuttleNumber,
-        uint256 _campaignNumber
-        uint256 _userShare,
+        uint256 _campaignNumber,
+        uint256 _userAmount,
+        uint256 _totalAmount,
         address payable _sender
     ) external onlyChildPool {
         require(
@@ -73,7 +74,7 @@ contract Campaign is ICampaign, CampaignSecurityModule {
             "!No Shuttle in Campaign"
         );
         
-        uint256 rewardAmount_ = campaigns[_campaignNumber].rewardAmountPerShuttle.mul(_userShare);
+        uint256 rewardAmount_ = campaigns[_campaignNumber].rewardAmountPerShuttle.mul(_userAmount).div(_totalAmount);
 
         campaigns[_campaignNumber].rewardToken.transfer(rewardAmount_, _sender);
 
