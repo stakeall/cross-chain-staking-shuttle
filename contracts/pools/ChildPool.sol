@@ -306,6 +306,24 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         }
     }
 
+    function claimWithRewards(uint256 _shuttleNumber, uint256 _campaignNumber) external nonRentrant whenNotPaused {
+        uint256 userAmount = balances[_shuttleNumber][msg.sender];
+        uint256 totalAmount = balances[_shuttleNumber].totalAmount;
+        
+        address payable beneficiary = payable(msg.sender);
+
+        claim(_shuttleNumber);
+        
+        campaign.claimRewards(
+            _shuttleNumber,
+            _campaignNumber,
+            userAmount,
+            totalAmount,
+            beneficiary
+        );
+        
+    }
+
     /**
      * @dev If a shuttle is not enrouted after a specific block delay of `shuttleExpiry` then any one can call this function and mark shuttle as expired.
      *      Once the shuttle is marked as expired, users can claim their deposited MATIC tokens.
