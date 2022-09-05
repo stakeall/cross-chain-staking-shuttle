@@ -62,7 +62,37 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         emit CampaignCreated(currentCampaign, _totalRewardAmount, _startShuttleNum, _endShuttleNum, address(_rewardToken));
     }
 
-    function claim(
+    function _modifyCampaignStatus(
+        uint256 _campaignNumber,
+        CampaignStatus _campaignStatus
+    ) internal {
+        require (_campaignNumber <= currentCampaign, "!No campaign");
+
+        CampaignStatus campaignStatus_ = campaigns[_campaignNumber].campaignStatus;
+
+        require(_campaignStatus != campaignStatus_, "!Same campaign status");
+
+        campaigns[_campaignNumber].campaignStatus = _campaignStatus;
+    }
+
+    function deleteCampaign(
+        uint256 _campaignNumber
+    ) external onlyRole(GOVERNANCE_ROLE) {
+        _modifyCampaignStatus(
+            _campaignNumber,
+            CampaignStatus.DELETED
+        );
+    }
+
+    function pauseCampaign(
+        uint256 _campaignNumber
+    ) external onlyRole(GOVERNANCE_ROLE) {
+        _modifyCampaignStatus(
+            _campaignNumber,
+            CampaignStatus.PAUSED
+        );
+    }
+
         uint256 _shuttleNumber,
         uint256 _campaignNumber,
         uint256 _userAmount,
