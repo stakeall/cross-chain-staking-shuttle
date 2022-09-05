@@ -257,7 +257,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      * @param _shuttleNumber Shuttle number for which user want's to claim token
      *
      */
-    function claim(uint256 _shuttleNumber) external nonReentrant whenNotPaused {
+    function _claim(uint256 _shuttleNumber) internal {
         Shuttle memory shuttle = shuttles[_shuttleNumber];
         ShuttleStatus status = shuttle.status;
 
@@ -306,13 +306,17 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         }
     }
 
-    function claimWithRewards(uint256 _shuttleNumber, uint256 _campaignNumber) external nonRentrant whenNotPaused {
+    function claim(uint256 _shuttleNumber) external nonReentrant whenNotPaused {
+        _claim(_shuttleNumber);
+    }
+
+    function claimWithRewards(uint256 _shuttleNumber, uint256 _campaignNumber) external nonReentrant whenNotPaused {
         uint256 userAmount = balances[_shuttleNumber][msg.sender];
-        uint256 totalAmount = balances[_shuttleNumber].totalAmount;
+        uint256 totalAmount = shuttles[_shuttleNumber].totalAmount;
         
         address payable beneficiary = payable(msg.sender);
 
-        claim(_shuttleNumber);
+        _claim(_shuttleNumber);
         
         campaign.claimRewards(
             _shuttleNumber,
