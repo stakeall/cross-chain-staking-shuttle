@@ -38,6 +38,8 @@ contract IChildPool {
     event ShuttleCancelled(uint256 _shuttleNumber);
     event FeeChanged(uint256 _fee);
     event ShuttleExpiryChanged(uint256 _shuttleExpiry);
+
+    event CampaignChanged(address _campaignAddress);
 }
 
 enum ShuttleProcessingStatus {
@@ -63,5 +65,15 @@ interface IMaticToken {
 
 interface IFundCollector {
     function withdrawFunds(uint256 _amount) external;
+}
+
+interface ICampaign {
+    function claimRewards(
+        uint256 _shuttleNumber,
+        uint256 _campaignNumber,
+        uint256 _userAmount,
+        uint256 _totalAmount,
+        address payable _sender
+    ) external;
 }
 

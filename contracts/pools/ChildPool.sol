@@ -26,6 +26,8 @@ contract ChildPool is IChildPool, PoolSecurityModule {
     address public feeBeneficiary;
     uint256 public constant FEE_DENOMINATOR = 10000;
 
+    ICampaign public campaign;
+
     mapping(uint256 => Shuttle) public shuttles;
     mapping(uint256 => mapping(address => uint256)) public balances;
 
@@ -406,6 +408,17 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         require(_feeBeneficiary != address(0), "!feeBeneficiary");
         
         feeBeneficiary = _feeBeneficiary;
+    }
+
+    function setCampaign(ICampaign _campaign) 
+        external
+        onlyRole(GOVERNANCE_ROLE)
+    {
+        require(address(_campaign) != address(0), "!Zero address");
+
+        campaign = _campaign;
+
+        emit CampaignChanged(address(campaign));
     }
 
     receive() external payable {}
