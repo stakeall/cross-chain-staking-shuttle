@@ -45,7 +45,7 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         uint256 _totalRewardAmount,
         IERC20 _rewardToken
     ) external onlyRole(GOVERNANCE_ROLE) {
-        uint256 totalShuttles_ = _endShuttle.sub(_startShuttle);
+        uint256 totalShuttles_ = _endShuttle.sub(_startShuttle).add(1);
         uint256 rewardAmountPerShuttle_ = _totalRewardAmount.div(totalShuttles_);
 
         currentCampaign = currentCampaign.add(1);
