@@ -26,6 +26,11 @@ contract ICampaign {
         address rewardToken
     );
 
+    event CampaignStatusModified(
+        uint256 campaignNumber,
+        CampaignStatus campaignStatus
+    );
+
     struct ACampaign {
         uint256 startShuttleNum;
         uint256 endShuttleNum;

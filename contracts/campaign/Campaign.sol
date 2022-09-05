@@ -73,6 +73,8 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         require(_campaignStatus != campaignStatus_, "!Same campaign status");
 
         campaigns[_campaignNumber].campaignStatus = _campaignStatus;
+
+        emit CampaignStatusModified(_campaignNumber, _campaignStatus);
     }
 
     function deleteCampaign(
