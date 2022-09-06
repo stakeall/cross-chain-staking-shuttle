@@ -21,6 +21,12 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         _;
     }
 
+    /**
+     * @dev - Initialize the contract and setup roles.
+     * 
+     * @param _owner - Address of the owner.
+     * @param _childPool - Address of the childPool.
+     */
     function initialize(
         address _owner,
         address _childPool
@@ -39,6 +45,15 @@ contract Campaign is ICampaign, CampaignSecurityModule {
 
     }
 
+
+    /**
+     * @dev - Create a new campaign.
+     *
+     * @param _startShuttleNum - First shuttle number from which the campaign starts.
+     * @param _endShuttleNum - Last shuttle number inclusive till which the campaign runs.
+     * @param _totalRewardAmount - Total reward amount offered in the campaign.
+     * @param _rewardToken - Address of the ERC20 reward token.
+     */
     function createCampaign(
         uint256 _startShuttleNum,
         uint256 _endShuttleNum,
@@ -69,6 +84,13 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         );
     }
 
+
+    /**
+     * @dev - Modify the status of any existing campaign.
+     *
+     * @param _campaignNumber - Number of the campaign.
+     * @param _campaignStatus - status of the campaign.
+     */
     function _modifyCampaignStatus(
         uint256 _campaignNumber,
         CampaignStatus _campaignStatus
@@ -84,6 +106,12 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         emit CampaignStatusModified(_campaignNumber, _campaignStatus);
     }
 
+
+    /**
+     * @dev - To delete a campaign.
+     *
+     * @param _campaignNumber - The campaign number to identify the campaign.
+     */
     function deleteCampaign(
         uint256 _campaignNumber
     ) external onlyRole(GOVERNANCE_ROLE) {
@@ -93,6 +121,11 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         );
     }
 
+    /** 
+     * @dev - To pause a campaign.
+     *
+     * @param _campaignNumber - The campaign number to identify the campaign.
+    */
     function pauseCampaign(
         uint256 _campaignNumber
     ) external onlyRole(GOVERNANCE_ROLE) {
@@ -102,6 +135,15 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         );
     }
 
+    /**
+     * @dev - To transfer rewards for the user based on the shares one has in the shuttle.
+     *
+     * @param _shuttleNumber - Shuttle number in which user has made deposits.
+     * @param _campaignNumber - Number of the campaign in which the shuttle was a part of.
+     * @param _userAmount - Amount the user deposited in the shuttle.
+     * @param _totalAmount - Amount of the deposits made to the shuttle.
+     * @param _sender - Address of the user.
+     */
     function claimRewards(
         uint256 _shuttleNumber,
         uint256 _campaignNumber,
