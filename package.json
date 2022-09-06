@@ -21,7 +21,11 @@
     "upgrade-pool-goerli": "npx hardhat run scripts/upgrade_pools.js --network goerli",
     "upgrade-pool-mumbai": "npx hardhat run scripts/upgrade_pools.js --network mumbai",
     "deploy-fund-collector": "npx hardhat run scripts/deploy_fund_collector.js --network mumbai",
-    "deploy-fund-collector-polygon": "npx hardhat run scripts/deploy_fund_collector.js --network truffle-dashboard"
+    "deploy-fund-collector-polygon": "npx hardhat run scripts/deploy_fund_collector.js --network truffle-dashboard",
+    "deploy-campaign-mumbai": "npx hardhat run scripts/deploy_campaign.js --network mumbai",
+    "deploy-campaign-polygon": "npx hardhat run scripts/deploy_campaign.js --network polygon",
+    "upgrade-campaign-mumbai": "npx hardhat run scripts/upgrade_campaign.js --network mumbai",
+    "upgrade-campaign-polygon": "npx hardhat run scripts/upgrade_campaign.js --network polygon"
   },
   "devDependencies": {
     "@ethersproject/bignumber": "5.6.0",
