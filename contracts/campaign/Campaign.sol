@@ -104,16 +104,25 @@ contract Campaign is ICampaign, CampaignSecurityModule {
     ) external onlyChildPool {
         require(
             campaigns[_campaignNumber].campaignStatus == CampaignStatus.ACTIVE,
-            "!Active Campaign"
+            "!inActive Campaign"
         );
 
         require(
             _shuttleNumber >= campaigns[_campaignNumber].startShuttleNum && 
             _shuttleNumber <= campaigns[_campaignNumber].endShuttleNum, 
-            "!No Shuttle in Campaign"
+            "!Shuttle not in Campaign"
         );
         
         uint256 rewardAmount_ = campaigns[_campaignNumber].rewardAmountPerShuttle.mul(_userAmount).div(_totalAmount);
+        uint256 totalClaimedAmount_ = campaigns[_campaignNumber].totalClaimedAmount.add(rewardAmount_);
+
+        require(
+            campaigns[_campaignNumber].totalRewardAmount >=
+            totalClaimedAmount_,
+            "!Not enough reward amount"
+        );
+
+        campaigns[_campaignNumber].totalClaimedAmount = totalClaimedAmount_;
 
         campaigns[_campaignNumber].rewardToken.transfer(_sender, rewardAmount_);
 
