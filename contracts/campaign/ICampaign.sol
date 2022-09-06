@@ -23,6 +23,7 @@ contract ICampaign {
         uint256 totalRewardAmount,
         uint256 startShuttle,
         uint256 endShuttle,
+        uint256 rewardAmountPerShuttle,
         address rewardToken
     );
 

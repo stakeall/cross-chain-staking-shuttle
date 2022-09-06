@@ -59,7 +59,14 @@ contract Campaign is ICampaign, CampaignSecurityModule {
             rewardToken: _rewardToken
         });
         
-        emit CampaignCreated(currentCampaign, _totalRewardAmount, _startShuttleNum, _endShuttleNum, address(_rewardToken));
+        emit CampaignCreated(
+            currentCampaign,
+            _totalRewardAmount,
+            _startShuttleNum,
+            _endShuttleNum,
+            rewardAmountPerShuttle,
+            address(_rewardToken)
+        );
     }
 
     function _modifyCampaignStatus(
