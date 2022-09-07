@@ -26,11 +26,11 @@ contract ChildPool is IChildPool, PoolSecurityModule {
     address public feeBeneficiary;
     uint256 public constant FEE_DENOMINATOR = 10000;
 
-    ICampaign public campaign;
-
     mapping(uint256 => Shuttle) public shuttles;
     mapping(uint256 => mapping(address => uint256)) public balances;
 
+    ICampaign public campaign;
+    
     /**
      * @dev Initialize the contract, setup roles and create first shuttle
      *
