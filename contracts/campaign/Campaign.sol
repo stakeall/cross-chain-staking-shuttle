@@ -135,6 +135,21 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         );
     }
 
+
+    /**
+     * @dev - Unpause a campaign
+     *
+     * @param _campaignNumber - The campaign number to identify the campaign.
+     */
+    function unpauseCampaign(
+        uint256 _campaignNumber
+    ) external onlyRole(GOVERNANCE_ROLE) {
+        _modifyCampaignStatus(
+            _campaignNumber,
+            CampaignStatus.ACTIVE
+        );
+    }
+
     /**
      * @dev - To transfer rewards for the user based on the shares one has in the shuttle.
      *
