@@ -79,7 +79,7 @@ contract Campaign is ICampaign, CampaignSecurityModule {
             _totalRewardAmount,
             _startShuttleNum,
             _endShuttleNum,
-            rewardAmountPerShuttle,
+            rewardAmountPerShuttle_,
             address(_rewardToken)
         );
     }

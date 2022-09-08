@@ -319,8 +319,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         uint256 _shuttleNumber,
         uint256 _campaignNumber,
         uint256 _userAmount,
-        uint256 _totalAmount,
-
+        uint256 _totalAmount
     ) internal {
         Shuttle memory shuttle = shuttles[_shuttleNumber];
         ShuttleStatus status = shuttle.status;
