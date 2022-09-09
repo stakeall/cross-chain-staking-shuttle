@@ -193,5 +193,19 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         emit RewardClaimed(_shuttleNumber, _campaignNumber, rewardAmount_, _sender);        
     }
 
+    /**
+     * @dev - Transfer unused reward tokens to the owner.
+     *
+     * @param _rewardToken - Address of the rewardToken.
+     * @param _amount - Amount to be transferred.
+     */
+    function transferUnusedRewards(
+        IERC20 _rewardToken,
+        uint256 _amount
+    ) external onlyRole(GOVERNANCE_ROLE) {
+        
+        require(_amount <= _rewardToken.balanceOf(address(this)), "!amount");
 
+        _rewardToken.transfer(owner, _amount);
+    }
 }
