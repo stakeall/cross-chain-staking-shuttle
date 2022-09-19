@@ -7,6 +7,10 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ICampaign.sol";
 import "./CampaignSecurityModule.sol";
 
+/**
+ * Manages N number of campaigns and the distribution of rewards 
+ * to the users who have staked to the childPool.
+ */
 contract Campaign is ICampaign, CampaignSecurityModule {
     using SafeMath for uint256;
 

@@ -472,6 +472,11 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         feeBeneficiary = _feeBeneficiary;
     }
 
+    /**
+     * @dev This will set the campaign address
+     *
+     * @param _campaign Address of the campaign.
+     */
     function setCampaign(ICampaign _campaign) 
         external
         onlyRole(GOVERNANCE_ROLE)
