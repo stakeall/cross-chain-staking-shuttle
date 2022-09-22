@@ -485,7 +485,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
 
         campaign = _campaign;
 
-        emit CampaignChanged(address(campaign));
+        emit CampaignChanged(address(_campaign));
     }
 
     receive() external payable {}
