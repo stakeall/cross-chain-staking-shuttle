@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.7;
 
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./ICampaign.sol";
@@ -12,7 +11,6 @@ import "./CampaignSecurityModule.sol";
  * to the users who have staked to the childPool.
  */
 contract Campaign is ICampaign, CampaignSecurityModule {
-    using SafeMath for uint256;
 
     uint256 public currentCampaign;
     address public owner;
@@ -64,9 +62,9 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         uint256 _totalRewardAmount,
         IERC20 _rewardToken
     ) external onlyRole(GOVERNANCE_ROLE) {
-        uint256 totalShuttles_ = _endShuttleNum.sub(_startShuttleNum).add(1);
-        uint256 rewardAmountPerShuttle_ = _totalRewardAmount.div(totalShuttles_);
-        uint256 currentCampaign_ = currentCampaign.add(1);
+        uint256 totalShuttles_ = _endShuttleNum - _startShuttleNum + 1;
+        uint256 rewardAmountPerShuttle_ = _totalRewardAmount / totalShuttles_;
+        uint256 currentCampaign_ = currentCampaign + 1;
 
         currentCampaign = currentCampaign_;
         campaigns[currentCampaign_] = ACampaign({
@@ -181,8 +179,8 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         if (_shuttleNumber < campaign_.startShuttleNum && _shuttleNumber > campaign_.endShuttleNum)
             revert ShuttleNotPartOfCampaign();
         
-        uint256 rewardAmount_ = campaign_.rewardAmountPerShuttle.mul(_userAmount).div(_totalAmount);
-        uint256 totalClaimedAmount_ = campaign_.totalClaimedAmount.add(rewardAmount_);
+        uint256 rewardAmount_ = campaign_.rewardAmountPerShuttle * _userAmount / _totalAmount;
+        uint256 totalClaimedAmount_ = campaign_.totalClaimedAmount + rewardAmount_;
 
         if (campaign_.totalRewardAmount < totalClaimedAmount_)
             revert NotEnoughRewardAmount();
