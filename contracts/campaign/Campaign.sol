@@ -23,6 +23,10 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         _;
     }
 
+    function _onlyGovernance() internal view {
+        _checkRole(GOVERNANCE_ROLE, msg.sender);
+    }
+
     /**
      * @dev - Initialize the contract and setup roles.
      * 
@@ -61,7 +65,8 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         uint256 _endShuttleNum,
         uint256 _totalRewardAmount,
         IERC20 _rewardToken
-    ) external onlyRole(GOVERNANCE_ROLE) {
+    ) external {
+        _onlyGovernance();
         uint256 totalShuttles_ = _endShuttleNum - _startShuttleNum + 1;
         uint256 rewardAmountPerShuttle_ = _totalRewardAmount / totalShuttles_;
         uint256 currentCampaign_ = currentCampaign + 1;
@@ -119,7 +124,8 @@ contract Campaign is ICampaign, CampaignSecurityModule {
      */
     function deleteCampaign(
         uint256 _campaignNumber
-    ) external onlyRole(GOVERNANCE_ROLE) {
+    ) external {
+        _onlyGovernance();
         _modifyCampaignStatus(
             _campaignNumber,
             CampaignStatus.DELETED
@@ -133,7 +139,8 @@ contract Campaign is ICampaign, CampaignSecurityModule {
     */
     function pauseCampaign(
         uint256 _campaignNumber
-    ) external onlyRole(GOVERNANCE_ROLE) {
+    ) external {
+        _onlyGovernance();
         _modifyCampaignStatus(
             _campaignNumber,
             CampaignStatus.PAUSED
@@ -148,7 +155,8 @@ contract Campaign is ICampaign, CampaignSecurityModule {
      */
     function unpauseCampaign(
         uint256 _campaignNumber
-    ) external onlyRole(GOVERNANCE_ROLE) {
+    ) external {
+        _onlyGovernance();
         _modifyCampaignStatus(
             _campaignNumber,
             CampaignStatus.ACTIVE
@@ -201,8 +209,8 @@ contract Campaign is ICampaign, CampaignSecurityModule {
     function transferUnusedRewards(
         IERC20 _rewardToken,
         uint256 _amount
-    ) external onlyRole(GOVERNANCE_ROLE) {
-        
+    ) external {
+        _onlyGovernance();
         require(_amount <= _rewardToken.balanceOf(address(this)), "!amount");
 
         _rewardToken.transfer(owner, _amount);
