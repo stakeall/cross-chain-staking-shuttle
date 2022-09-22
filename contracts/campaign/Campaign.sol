@@ -66,9 +66,10 @@ contract Campaign is ICampaign, CampaignSecurityModule {
     ) external onlyRole(GOVERNANCE_ROLE) {
         uint256 totalShuttles_ = _endShuttleNum.sub(_startShuttleNum).add(1);
         uint256 rewardAmountPerShuttle_ = _totalRewardAmount.div(totalShuttles_);
+        uint256 currentCampaign_ = currentCampaign.add(1);
 
-        currentCampaign = currentCampaign.add(1);
-        campaigns[currentCampaign] = ACampaign({
+        currentCampaign = currentCampaign_;
+        campaigns[currentCampaign_] = ACampaign({
             startShuttleNum: _startShuttleNum,
             endShuttleNum: _endShuttleNum,
             totalRewardAmount: _totalRewardAmount,
@@ -79,7 +80,7 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         });
         
         emit CampaignCreated(
-            currentCampaign,
+            currentCampaign_,
             _totalRewardAmount,
             _startShuttleNum,
             _endShuttleNum,
