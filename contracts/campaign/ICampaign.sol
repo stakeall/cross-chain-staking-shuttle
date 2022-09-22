@@ -41,4 +41,15 @@ interface ICampaign {
         CampaignStatus campaignStatus;
         IERC20 rewardToken;
     }
+
+    error InvalidCampaign();
+
+    error SameCampaignStatus();
+
+    error InactiveCampaign();
+
+    error ShuttleNotPartOfCampaign();
+
+    error NotEnoughRewardAmount();
+
 }

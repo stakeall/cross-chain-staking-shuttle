@@ -100,11 +100,13 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         uint256 _campaignNumber,
         CampaignStatus _campaignStatus
     ) internal {
-        require (_campaignNumber <= currentCampaign, "!No campaign");
-
+        if (_campaignNumber > currentCampaign)
+            revert InvalidCampaign();
+        
         CampaignStatus campaignStatus_ = campaigns[_campaignNumber].campaignStatus;
 
-        require(_campaignStatus != campaignStatus_, "!Same campaign status");
+        if (_campaignStatus == campaignStatus_)
+            revert SameCampaignStatus();
 
         campaigns[_campaignNumber].campaignStatus = _campaignStatus;
 
@@ -171,29 +173,23 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         uint256 _totalAmount,
         address payable _sender
     ) external onlyChildPool {
-        require(
-            campaigns[_campaignNumber].campaignStatus == CampaignStatus.ACTIVE,
-            "!inActive Campaign"
-        );
+        ACampaign memory campaign_ = campaigns[_campaignNumber];
 
-        require(
-            _shuttleNumber >= campaigns[_campaignNumber].startShuttleNum && 
-            _shuttleNumber <= campaigns[_campaignNumber].endShuttleNum, 
-            "!Shuttle not in Campaign"
-        );
+        if (campaign_.campaignStatus != CampaignStatus.ACTIVE)
+            revert InactiveCampaign();
+
+        if (_shuttleNumber < campaign_.startShuttleNum && _shuttleNumber > campaign_.endShuttleNum)
+            revert ShuttleNotPartOfCampaign();
         
-        uint256 rewardAmount_ = campaigns[_campaignNumber].rewardAmountPerShuttle.mul(_userAmount).div(_totalAmount);
-        uint256 totalClaimedAmount_ = campaigns[_campaignNumber].totalClaimedAmount.add(rewardAmount_);
+        uint256 rewardAmount_ = campaign_.rewardAmountPerShuttle.mul(_userAmount).div(_totalAmount);
+        uint256 totalClaimedAmount_ = campaign_.totalClaimedAmount.add(rewardAmount_);
 
-        require(
-            campaigns[_campaignNumber].totalRewardAmount >=
-            totalClaimedAmount_,
-            "!Not enough reward amount"
-        );
+        if (campaign_.totalRewardAmount < totalClaimedAmount_)
+            revert NotEnoughRewardAmount();
 
         campaigns[_campaignNumber].totalClaimedAmount = totalClaimedAmount_;
 
-        campaigns[_campaignNumber].rewardToken.transfer(_sender, rewardAmount_);
+        campaign_.rewardToken.transfer(_sender, rewardAmount_);
 
         emit RewardClaimed(_shuttleNumber, _campaignNumber, rewardAmount_, _sender);        
     }
