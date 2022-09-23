@@ -57,7 +57,7 @@ describe("ChildPool.enrouteShuttle", function () {
         );
 
         await expect(childPool.connect(owner).enrouteShuttle(1))
-            .to.be.revertedWith('!amount');
+            .to.be.revertedWith('ZeroAmount');
 
     });
 
@@ -83,7 +83,7 @@ describe("ChildPool.enrouteShuttle", function () {
 
 
         await expect(childPool.connect(owner).enrouteShuttle(1))
-            .to.be.revertedWith('!already enrouted shuttle');
+            .to.be.revertedWith('AlreadyEnroutedShuttle');
     });
 
     it('should fail for non operator role', async () => {

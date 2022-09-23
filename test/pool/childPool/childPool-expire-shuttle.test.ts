@@ -71,7 +71,7 @@ describe("ChildPool.expireShuttle", function () {
 
         await advanceBlocks(2);
 
-        await expect(childPool.connect(user1).expireShuttle(1)).to.be.revertedWith("!not ready to expire");
+        await expect(childPool.connect(user1).expireShuttle(1)).to.be.revertedWith("NotReadyToExpire");
     });
 
     it('should revert if shuttle status is not AVAILABLE ', async () => {
@@ -89,7 +89,7 @@ describe("ChildPool.expireShuttle", function () {
 
 
         const wrongShuttleId = 10;
-        await expect(childPool.connect(user1).expireShuttle(wrongShuttleId)).to.be.revertedWith("!only current shuttle allowed");
+        await expect(childPool.connect(user1).expireShuttle(wrongShuttleId)).to.be.revertedWith("NotCurrentShuttle");
     });
 
     it('should allow deposit of funds to next shuttle if current shuttle is expired ', async() => {
