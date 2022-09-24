@@ -184,7 +184,7 @@ contract Campaign is ICampaign, CampaignSecurityModule {
         if (campaign_.campaignStatus != CampaignStatus.ACTIVE)
             revert InactiveCampaign();
 
-        if (_shuttleNumber < campaign_.startShuttleNum && _shuttleNumber > campaign_.endShuttleNum)
+        if (_shuttleNumber < campaign_.startShuttleNum || _shuttleNumber > campaign_.endShuttleNum)
             revert ShuttleNotPartOfCampaign();
         
         uint256 rewardAmount_ = campaign_.rewardAmountPerShuttle * _userAmount / _totalAmount;
