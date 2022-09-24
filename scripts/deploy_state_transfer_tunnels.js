@@ -12,8 +12,8 @@ function sleep(ms) {
   });
 }
 
-const deployRoot =
-  hre.network.name === "goerli" || hre.network.name === "mainnet";
+const deployRoot = false;
+  //hre.network.name === "goerli" || hre.network.name === "mainnet";
 
 async function main() {
   const verificationEnabled = true;

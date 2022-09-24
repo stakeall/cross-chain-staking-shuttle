@@ -5,8 +5,8 @@ const addresses = require("./address.js");
 
 console.log("hre.network.name ", hre.network.name);
 
-const deployRoot =
-  hre.network.name === "goerli" || hre.network.name === "mainnet";
+const deployRoot = true;
+  //hre.network.name === "goerli" || hre.network.name === "mainnet";
 
 async function main() {
   const [deployer] = await ethers.getSigners();
