@@ -481,7 +481,8 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         external
         onlyRole(GOVERNANCE_ROLE)
     {
-        require(address(_campaign) != address(0), "!Zero address");
+        if (address(_campaign) == address(0))
+            revert ZeroAddress();
 
         campaign = _campaign;
 

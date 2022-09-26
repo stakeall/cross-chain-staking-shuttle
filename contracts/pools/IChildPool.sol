@@ -40,6 +40,8 @@ contract IChildPool {
     event ShuttleExpiryChanged(uint256 _shuttleExpiry);
 
     event CampaignChanged(address _campaignAddress);
+
+    error ZeroAddress();
 }
 
 enum ShuttleProcessingStatus {
