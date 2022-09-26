@@ -40,25 +40,6 @@ contract IChildPool {
     event ShuttleExpiryChanged(uint256 _shuttleExpiry);
 
     event CampaignChanged(address _campaignAddress);
-
-    error ZeroAmount();
-    error ZeroAddress();
-    error InsufficientBalance(string tokenName);
-
-    error InvalidShuttleStatus();
-    error NotCurrentShuttle();
-    
-    error AlreadyEnroutedShuttle();
-    error ShuttleShouldBeEnrouted();
-    
-    error ShuttleMsgNotReceived();
-    
-    error NotReadyForExpiry();
-    error NotReadyToExpire();
-    error InvalidShuttleExpiry();
-    
-    error GreaterFee();
-    error NoRewards();
 }
 
 enum ShuttleProcessingStatus {

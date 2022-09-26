@@ -90,8 +90,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      *
      */
     function deposit() external payable whenNotPaused {
-        if (msg.value <= 0)
-            revert ZeroAmount();
+        require(msg.value > 0, "!amount");
 
         uint256 amount = msg.value;
 
@@ -121,16 +120,13 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         whenNotPaused
         onlyRole(OPERATOR_ROLE)
     {
-        if (enroutedShuttle != 0)
-            revert AlreadyEnroutedShuttle();
-
-        ShuttleStatus status_ = shuttles[_shuttleNumber].status;
-        if (status_ != ShuttleStatus.AVAILABLE)
-            revert InvalidShuttleStatus();
-        
+        require(enroutedShuttle == 0, "!already enrouted shuttle");
+        require(
+            shuttles[_shuttleNumber].status == ShuttleStatus.AVAILABLE,
+            "!status"
+        );
         uint256 amount = shuttles[_shuttleNumber].totalAmount;
-        if (amount <= 0)
-            revert ZeroAmount();
+        require(amount > 0, "!amount");
 
         enroutedShuttle = _shuttleNumber;
         shuttles[_shuttleNumber].status = ShuttleStatus.ENROUTE;
@@ -166,12 +162,14 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         whenNotPaused
         onlyRole(OPERATOR_ROLE)
     {
-        if (enroutedShuttle != _shuttleNumber)
-            revert ShuttleShouldBeEnrouted();
-
-        ShuttleStatus status_ = shuttles[_shuttleNumber].status;
-        if (status_ != ShuttleStatus.ENROUTE)
-            revert InvalidShuttleStatus();
+        require(
+            enroutedShuttle == _shuttleNumber,
+            "!Shuttle should be enrouted"
+        );
+        require(
+            shuttles[_shuttleNumber].status == ShuttleStatus.ENROUTE,
+            "!status"
+        );
 
         (
             uint256 shuttleNumber,
@@ -179,17 +177,22 @@ contract ChildPool is IChildPool, PoolSecurityModule {
             ShuttleProcessingStatus shuttleProcessingStatus
         ) = childTunnel.readData();
 
-        if (shuttleNumber != _shuttleNumber)
-            revert ShuttleMsgNotReceived();
-        
+        require(
+            shuttleNumber == _shuttleNumber,
+            "!shuttle message not recieved"
+        );
+
         uint256 shuttleFee = 0;
         // reset it so that next shuttle can be enrouted
         enroutedShuttle = 0;
 
         if (shuttleProcessingStatus == ShuttleProcessingStatus.PROCESSED) {
             // make sure stMatic is arrived from bridge
-            if (stMaticToken.balanceOf(address(this)) < availableStMaticBalance.add(amount))
-                revert InsufficientBalance("stMatic");
+            require(
+                stMaticToken.balanceOf(address(this)) >=
+                    availableStMaticBalance.add(amount),
+                "!insufficient stMatic balance"
+            );
 
             shuttleFee = calculateFee(amount);
             uint256 recievedToken = amount.sub(shuttleFee);
@@ -209,12 +212,13 @@ contract ChildPool is IChildPool, PoolSecurityModule {
             fundCollector.withdrawFunds(amount);
 
             // make sure Matic base token is arrived from bridge in case on cancellation
-            if (address(this).balance <
+            require(
+                address(this).balance >=
                     availableMaticBalance.add(
                         shuttles[shuttleNumber].totalAmount
-                    )
-                )
-                revert InsufficientBalance("Matic");
+                    ),
+                "!insufficient Matic balance"
+            );
 
             availableMaticBalance = availableMaticBalance.add(amount);
             shuttles[_shuttleNumber].recievedToken = 0;
@@ -257,20 +261,19 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         Shuttle memory shuttle = shuttles[_shuttleNumber];
         ShuttleStatus status = shuttle.status;
 
-        if (
-            !(status == ShuttleStatus.ARRIVED ||
+        require(
+            status == ShuttleStatus.ARRIVED ||
                 status == ShuttleStatus.EXPIRED ||
-                status == ShuttleStatus.CANCELLED)
-        )
-            revert InvalidShuttleStatus();
+                status == ShuttleStatus.CANCELLED,
+            "!invalid shuttle status"
+        );
 
         uint256 balance = balances[_shuttleNumber][msg.sender];
         balances[_shuttleNumber][msg.sender] = 0;
 
         address payable beneficiary = payable(msg.sender);
 
-        if (balance <= 0)
-            revert ZeroAmount();
+        require(balance > 0, "!amount");
 
         if (status == ShuttleStatus.ARRIVED) {
             // calculate stMatic Amount
@@ -321,8 +324,10 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         Shuttle memory shuttle = shuttles[_shuttleNumber];
         ShuttleStatus status = shuttle.status;
 
-        if (status != ShuttleStatus.ARRIVED)
-            revert NoRewards();
+        require(
+            status == ShuttleStatus.ARRIVED, 
+            "!no rewards"
+        );
 
         address payable beneficiary = payable(msg.sender);
 
@@ -371,16 +376,15 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      *
      */
     function expireShuttle(uint256 _shuttleNumber) external whenNotPaused {
-        if (_shuttleNumber != currentShuttle)
-            revert NotCurrentShuttle();
-        
+        require(
+            _shuttleNumber == currentShuttle,
+            "!only current shuttle allowed"
+        );
         Shuttle memory shuttle = shuttles[_shuttleNumber];
 
-        if (shuttle.totalAmount == 0)
-            revert NotReadyForExpiry();
+        require(shuttle.totalAmount > 0, "!Not ready for expiry");
 
-        if (block.number < shuttle.expiry)
-            revert NotReadyToExpire();
+        require(block.number >= shuttle.expiry, "!not ready to expire");
 
         shuttles[_shuttleNumber].status = ShuttleStatus.EXPIRED;
 
@@ -397,12 +401,12 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         external
         onlyRole(OPERATOR_ROLE)
     {
-         if (_shuttleNumber != currentShuttle)
-            revert NotCurrentShuttle();
-        
+        require(
+            _shuttleNumber == currentShuttle,
+            "!only current shuttle allowed"
+        );
         Shuttle memory shuttle = shuttles[_shuttleNumber];
-        if (shuttle.status != ShuttleStatus.AVAILABLE)
-            revert InvalidShuttleStatus();
+        require(shuttle.status == ShuttleStatus.AVAILABLE, "!invalid status");
 
         shuttles[_shuttleNumber].status = ShuttleStatus.CANCELLED;
         _createNewShuttle();
@@ -419,8 +423,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      */
     function setFee(uint256 _fee) external onlyRole(GOVERNANCE_ROLE) {
 
-        if (fee > FEE_DENOMINATOR)
-            revert GreaterFee();
+        require(_fee <= FEE_DENOMINATOR, "!fee");
         fee = _fee;
         emit FeeChanged(fee);
     }
@@ -435,8 +438,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         external
         onlyRole(GOVERNANCE_ROLE)
     {
-        if (_shuttleExpiry <= 0)
-            revert InvalidShuttleExpiry();
+        require(_shuttleExpiry > 0, "Invalid shuttle expiry");
 
         shuttleExpiry = _shuttleExpiry;
         emit ShuttleExpiryChanged(shuttleExpiry);
@@ -451,8 +453,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         external
         onlyRole(GOVERNANCE_ROLE)
     {
-        if (_fundCollector == address(0))
-            revert ZeroAddress();
+        require(_fundCollector != address(0), "!fundCollector");
         
         fundCollector = IFundCollector(_fundCollector);
     }
@@ -466,8 +467,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         external
         onlyRole(GOVERNANCE_ROLE)
     {
-        if (_feeBeneficiary == address(0))
-            revert ZeroAddress();
+        require(_feeBeneficiary != address(0), "!feeBeneficiary");
         
         feeBeneficiary = _feeBeneficiary;
     }
@@ -481,8 +481,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         external
         onlyRole(GOVERNANCE_ROLE)
     {
-        if (address(_campaign) == address(0))
-            revert ZeroAddress();
+        require(address(_campaign) != address(0), "!Zero address");
 
         campaign = _campaign;
 
