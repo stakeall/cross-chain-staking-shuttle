@@ -52,7 +52,7 @@ describe("ChildPool.deposit", function () {
         await expect(childPool.connect(user1).deposit({
             value: amount
         }))
-            .to.be.revertedWith('!amount');
+            .to.be.revertedWith('ZeroAmount');
 
     });
 
@@ -71,7 +71,7 @@ describe("ChildPool.deposit", function () {
         await expect(childPool.connect(user1).deposit({
             value: '0'
         }))
-            .to.be.revertedWith('!amount');
+            .to.be.revertedWith('ZeroAmount');
 
     });
 

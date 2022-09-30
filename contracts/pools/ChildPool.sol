@@ -29,6 +29,8 @@ contract ChildPool is IChildPool, PoolSecurityModule {
     mapping(uint256 => Shuttle) public shuttles;
     mapping(uint256 => mapping(address => uint256)) public balances;
 
+    ICampaign public campaign;
+    
     /**
      * @dev Initialize the contract, setup roles and create first shuttle
      *
@@ -255,7 +257,7 @@ contract ChildPool is IChildPool, PoolSecurityModule {
      * @param _shuttleNumber Shuttle number for which user want's to claim token
      *
      */
-    function claim(uint256 _shuttleNumber) external nonReentrant whenNotPaused {
+    function _claim(uint256 _shuttleNumber) internal {
         Shuttle memory shuttle = shuttles[_shuttleNumber];
         ShuttleStatus status = shuttle.status;
 
@@ -302,6 +304,68 @@ contract ChildPool is IChildPool, PoolSecurityModule {
                 balance
             );
         }
+    }
+
+
+    /**
+     * @dev - This function calls the claimRewards method on the campaign, if shuttle status is arrived.
+     *
+     * @param _shuttleNumber - Shuttle number from which the user wants to claim.
+     * @param _campaignNumber - Campaign number from which the reward has to be claimed.
+     * @param _userAmount - amount the user deposited in that shuttle.
+     * @param _totalAmount - total amount of the shuttle.   
+     */
+    function _claimRewards(
+        uint256 _shuttleNumber,
+        uint256 _campaignNumber,
+        uint256 _userAmount,
+        uint256 _totalAmount
+    ) internal {
+        Shuttle memory shuttle = shuttles[_shuttleNumber];
+        ShuttleStatus status = shuttle.status;
+
+        require(
+            status == ShuttleStatus.ARRIVED, 
+            "!no rewards"
+        );
+
+        address payable beneficiary = payable(msg.sender);
+
+        campaign.claimRewards(
+            _shuttleNumber,
+            _campaignNumber,
+            _userAmount,
+            _totalAmount,
+            beneficiary
+        );
+    }
+
+    /**
+     * @dev - calls the internal _claim method.
+     *
+     * @param _shuttleNumber - Shuttle number from which user wants to claim.
+    */
+    function claim(uint256 _shuttleNumber) external nonReentrant whenNotPaused {
+        _claim(_shuttleNumber);
+    }
+
+
+    /**
+     * @dev - This function allows to claim funds along with the rewards during an active campaign.
+     * 1. call the internal claim to claim funds.
+     * 2. call the internal claimRewards to claim the rewards.
+     *
+     * @param _shuttleNumber - Shuttle number from which the user wants to claim.
+     * @param _campaignNumber - Campaign number from which to claim the reward.
+     */
+    function claimWithRewards(uint256 _shuttleNumber, uint256 _campaignNumber) external nonReentrant whenNotPaused {
+        uint256 userAmount = balances[_shuttleNumber][msg.sender];
+        uint256 totalAmount = shuttles[_shuttleNumber].totalAmount;
+    
+        _claim(_shuttleNumber);
+
+        _claimRewards(_shuttleNumber, _campaignNumber, userAmount, totalAmount);
+        
     }
 
     /**
@@ -406,6 +470,23 @@ contract ChildPool is IChildPool, PoolSecurityModule {
         require(_feeBeneficiary != address(0), "!feeBeneficiary");
         
         feeBeneficiary = _feeBeneficiary;
+    }
+
+    /**
+     * @dev This will set the campaign address
+     *
+     * @param _campaign Address of the campaign.
+     */
+    function setCampaign(ICampaign _campaign) 
+        external
+        onlyRole(GOVERNANCE_ROLE)
+    {
+        if (address(_campaign) == address(0))
+            revert ZeroAddress();
+
+        campaign = _campaign;
+
+        emit CampaignChanged(address(_campaign));
     }
 
     receive() external payable {}

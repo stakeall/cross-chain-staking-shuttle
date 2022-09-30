@@ -100,7 +100,7 @@ describe("ChildPool.arriveShuttle", function () {
         // mock message arrival 
         await mockFxStateChildTunnel.setLatestData(encodedMessageData);
 
-        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith("!insufficient stMatic balance");
+        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith('InsufficientBalance("stMatic")');
 
     });
 
@@ -155,7 +155,7 @@ describe("ChildPool.arriveShuttle", function () {
         // mock token arrival 
         await stMaticToken.mint(childPool.address, shuttleArrivalData.stMaticAmount);
 
-        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith("!shuttle message not recieved");
+        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith("ShuttleMsgNotReceived");
     });
 
     it('should fail if shuttle already arrived', async () => {
@@ -183,7 +183,7 @@ describe("ChildPool.arriveShuttle", function () {
 
         await childPool.connect(owner).arriveShuttle(1);
 
-        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith("!Shuttle should be enrouted");
+        await expect(childPool.connect(owner).arriveShuttle(1)).to.be.revertedWith("ShuttleShouldBeEnrouted");
     });
 
     it('should fail for non operator role', async () => {
@@ -228,7 +228,7 @@ describe("ChildPool.arriveShuttle", function () {
             .to.emit(childPool, 'Deposit').withArgs(2, user1.address, amount);
 
         await expect(childPool.connect(owner).enrouteShuttle(2))
-            .to.be.revertedWith('!already enrouted shuttle');
+            .to.be.revertedWith('AlreadyEnroutedShuttle');
     })
 
     it('should let enroute other shuttle if current shuttle is not arrived', async () => {

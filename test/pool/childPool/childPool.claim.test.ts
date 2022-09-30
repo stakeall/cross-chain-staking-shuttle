@@ -86,7 +86,7 @@ describe("ChildPool.claim", function () {
         // deploy child pool
         const { childPool, mockFxStateChildTunnel } = await getShuttleInEnrouteState(deployer, 2000, owner, user1, user2);
 
-        await expect(childPool.connect(user1).claim(1)).to.be.revertedWith('!invalid shuttle status');
+        await expect(childPool.connect(user1).claim(1)).to.be.revertedWith('InvalidShuttleStatus');
     });
 
     it('should fail if user doesnot have deposit in shuttle', async() => {
@@ -103,7 +103,7 @@ describe("ChildPool.claim", function () {
             "2"
         );  
 
-        await expect(childPool.connect(deployer).claim(1)).to.be.revertedWith('!amount');
+        await expect(childPool.connect(deployer).claim(1)).to.be.revertedWith('ZeroAmount');
     });
 
     it('user should not be able to claim twice', async() => {
@@ -130,7 +130,7 @@ describe("ChildPool.claim", function () {
         const expectedStMaticAmountUser1 = user1Deposit.mul(recievedAmount).div(totalAmount);
 
         await expect(childPool.connect(user1).claim(1)).to.emit(childPool, 'TokenClaimed').withArgs(1, stMaticToken.address, user1.address, expectedStMaticAmountUser1);
-        await expect(childPool.connect(user1).claim(1)).to.be.revertedWith('!amount');        
+        await expect(childPool.connect(user1).claim(1)).to.be.revertedWith('ZeroAmount');        
     });
 
     it('should allow users to claim tokens after shuttle is expired', async() => {
