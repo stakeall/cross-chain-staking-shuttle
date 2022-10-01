@@ -9,6 +9,11 @@
       "address": "0x1E78e334B1730605438Bf8018A538E09d688C13E",
       "txHash": "0xb33809075bd9f06d8ff530efa42729cd89f0d8514a13a55d41528d80cebeb318",
       "kind": "transparent"
+    },
+    {
+      "address": "0x21Da22Aa67FC97260B39872381b0F112D6309D04",
+      "txHash": "0x3a943e984d34b3ee386e7c7e938083d0d11785876376a425e76d9c317bbd544e",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -318,6 +323,243 @@
               }
             ],
             "numberOfBytes": "128"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "3a110eed14b216fc0f646e20ab6db4a994c8adf8b200f093e6f7f5bd9d12ef7f": {
+      "address": "0xaF95A13a5C52b3700C405a4cb22A7f8eCb6C5383",
+      "txHash": "0x62d63463e1718c89cd83968c081cd62c23da9ba11df31d62b8d545e8d9a50105",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC165Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "label": "_roles",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)34_storage)",
+            "contract": "AccessControlUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:61"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "AccessControlUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:235"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:102"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "label": "currentCampaign",
+            "offset": 0,
+            "slot": "251",
+            "type": "t_uint256",
+            "contract": "Campaign",
+            "src": "contracts/campaign/Campaign.sol:15"
+          },
+          {
+            "label": "owner",
+            "offset": 0,
+            "slot": "252",
+            "type": "t_address",
+            "contract": "Campaign",
+            "src": "contracts/campaign/Campaign.sol:16"
+          },
+          {
+            "label": "childPool",
+            "offset": 0,
+            "slot": "253",
+            "type": "t_address",
+            "contract": "Campaign",
+            "src": "contracts/campaign/Campaign.sol:17"
+          },
+          {
+            "label": "campaigns",
+            "offset": 0,
+            "slot": "254",
+            "type": "t_mapping(t_uint256,t_struct(ACampaign)2188_storage)",
+            "contract": "Campaign",
+            "src": "contracts/campaign/Campaign.sol:19"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IERC20)1372": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_enum(CampaignStatus)2140": {
+            "label": "enum ICampaign.CampaignStatus",
+            "members": [
+              "ACTIVE",
+              "PAUSED",
+              "DELETED"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)34_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(ACampaign)2188_storage)": {
+            "label": "mapping(uint256 => struct ICampaign.ACampaign)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(ACampaign)2188_storage": {
+            "label": "struct ICampaign.ACampaign",
+            "members": [
+              {
+                "label": "startShuttleNum",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "endShuttleNum",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "totalRewardAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "totalClaimedAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "rewardAmountPerShuttle",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "campaignStatus",
+                "type": "t_enum(CampaignStatus)2140",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "rewardToken",
+                "type": "t_contract(IERC20)1372",
+                "offset": 1,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_struct(RoleData)34_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
           },
           "t_uint256": {
             "label": "uint256",

@@ -33,8 +33,8 @@ const addresses = {
     stMaticToken: "0x3A58a54C066FdC0f2D55FC9C89F0415C92eBf3C4",
     fee: 50,
     shuttleExpiry: 302400,
-    feeBeneficiary: "0x8bA3f40ad569c3266D427Ae6eDE43b2A31f25E86",
-    childPoolOwner: "0x8bA3f40ad569c3266D427Ae6eDE43b2A31f25E86",
+    feeBeneficiary: "0xCb0083b8b66248b7E343610388A7a16542D7Dd5E",
+    childPoolOwner: "0xCb0083b8b66248b7E343610388A7a16542D7Dd5E",
     childPoolProxy: "0x1E78e334B1730605438Bf8018A538E09d688C13E",
   },
   80001: {
