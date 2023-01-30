@@ -26,14 +26,20 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
     );
 
     uint256 public feePercentage;
+    address public referrer;
 
     function initialize(uint256 _feePercentage) external initializer {
         feePercentage = _feePercentage;
         __Ownable_init_unchained();
+        referrer = owner();
     }
 
     function changeFeePercentage(uint256 _newFeePercentage) external onlyOwner {
         feePercentage = _newFeePercentage;
+    }
+
+    function changeReferrer(address _newReferrer) external onlyOwner {
+        referrer = _newReferrer;
     }
 
     /**
@@ -268,7 +274,7 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
 
         maticToken.safeApprove(address(stMaticProxy), 0);
         maticToken.safeApprove(address(stMaticProxy), oneInchData._buyAmt);
-        uint256 stTokenAmount = stMaticProxy.submit(oneInchData._buyAmt);
+        uint256 stTokenAmount = stMaticProxy.submit(oneInchData._buyAmt, referrer);
 
         emit Deposited(
             msg.sender,
@@ -289,7 +295,7 @@ contract PoLidoAdapter is Helpers, Initializable, OwnableUpgradeable {
 
         maticToken.safeApprove(address(stMaticProxy), 0);
         maticToken.safeApprove(address(stMaticProxy), _amount);
-        uint256 stTokenAmount = stMaticProxy.submit(_amount);
+        uint256 stTokenAmount = stMaticProxy.submit(_amount, referrer);
 
         return stTokenAmount;
     }
